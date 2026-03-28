@@ -7,11 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.student_finance_manager_app.ui.theme.Student_Finance_Manager_AppTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.student_finance_manager_app.presentation.ui.screens.login.LoginScreen
+import com.example.student_finance_manager_app.presentation.viewmodel.FinanceViewModel
+import com.example.student_finance_manager_app.presentation.theme.Student_Finance_Manager_AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,28 +20,27 @@ class MainActivity : ComponentActivity() {
         setContent {
             Student_Finance_Manager_AppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    val viewModel: FinanceViewModel = viewModel()
+                    LoginScreen()
+                    /*RegisterScreen()
+                    DashboardScreen(
+                        viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
+                    AddTransactionScreen(
+                        viewModel = viewModel
+                    )
+                    ProfileScreen(
+                        viewModel = viewModel
+                    )
+                    BudgetScreen(
+                        viewModel = viewModel
+                    )
+                    TransactionScreen(
+                        viewModel = viewModel
+                    )*/
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Student_Finance_Manager_AppTheme {
-        Greeting("Android")
     }
 }
