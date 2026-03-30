@@ -1,0 +1,107 @@
+package com.example.student_finance_manager_app.presentation.ui.screens.login
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.student_finance_manager_app.R
+import com.example.student_finance_manager_app.presentation.ui.components.FormField
+
+@Composable
+fun LoginScreen(
+    onNavigateToRegister: () -> Unit = {},
+    onLoginSuccess: () -> Unit = {}
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+    val errorEmailPrazan = stringResource(R.string.error_email_prazan)
+    val errorEmailIspravan = stringResource(R.string.error_email_ispravan)
+    val errorLozinkaPrazna = stringResource(R.string.error_lozinka_prazna)
+    val errorLozinkaKratka = stringResource(R.string.error_lozinka_kratka)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.padding_medium))
+            .padding(top = dimensionResource(R.dimen.padding_large))
+    ) {
+        Text(
+            text = stringResource(R.string.login_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_medium))
+        )
+        FormField(
+            label = stringResource(R.string.label_email),
+            value = email,
+            onValueChange = { email = it; error = null },
+            isError = error != null,
+            errorMessage = error
+        )
+        FormField(
+            label = stringResource(R.string.label_lozinka),
+            value = password,
+            onValueChange = { password = it; error = null },
+            isError = error != null,
+            errorMessage = error
+        )
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
+        if (error != null) {
+            Text(
+                text = error!!,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
+            )
+        }
+        Button(
+            onClick = {
+                when {
+                    email.isBlank() -> error = errorEmailPrazan
+                    !email.contains("@") -> error = errorEmailIspravan
+                    password.isBlank() -> error = errorLozinkaPrazna
+                    password.length < 6 -> error = errorLozinkaKratka
+                    else -> {
+                        error = null
+                        onLoginSuccess()
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = email.isNotBlank() && password.isNotBlank()
+        ) {
+            Text(text = stringResource(R.string.btn_login))
+        }
+        TextButton(
+            onClick = onNavigateToRegister,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(R.string.nemas_racun))
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    MaterialTheme {
+        LoginScreen()
+    }
+}
