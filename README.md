@@ -1,4 +1,5 @@
-#💰 Student Finance Manager
+# 💰 Student Finance Manager
+
 An Android application designed to help students manage their personal budget. Users can track income and expenses, and the app automatically calculates the remaining budget or deficit.
 🚧 Status
 Work in progress
