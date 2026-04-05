@@ -26,7 +26,8 @@ import com.example.student_finance_manager_app.presentation.ui.components.FormFi
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit = {},
-    onLoginSuccess: () -> Unit = {}
+    onLoginSuccess: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -37,7 +38,7 @@ fun LoginScreen(
     val errorLozinkaKratka = stringResource(R.string.error_lozinka_kratka)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_medium))
             .padding(top = dimensionResource(R.dimen.padding_large))

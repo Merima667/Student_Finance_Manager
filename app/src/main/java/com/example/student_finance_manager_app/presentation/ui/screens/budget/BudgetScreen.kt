@@ -15,10 +15,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.Category
 import com.example.student_finance_manager_app.presentation.ui.screens.budget.component.BudgetProgressBar
-import com.example.student_finance_manager_app.presentation.viewmodel.FinanceViewModel
 
 @Composable
-fun BudgetScreen(viewModel: FinanceViewModel) {
+fun BudgetScreen(
+    monthlyBudget: Double = 500.0,
+    spentOnFood: Double = 8.50,
+    spentOnTransport: Double = 2.0,
+    spentOnEducation: Double = 35.0,
+    spentOnEntertainment: Double = 0.0,
+    spentOnHealth: Double = 0.0,
+    spentOnOther: Double = 300.0,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,43 +39,47 @@ fun BudgetScreen(viewModel: FinanceViewModel) {
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
         )
         Text(
-            text = stringResource(R.string.budget_monthly).format(viewModel.userProfile.monthlyBudget),
+            text = stringResource(R.string.budget_monthly).format(monthlyBudget),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
         )
-
-        val spentOnFood = viewModel.transactions
-            .filter { it.category == Category.FOOD }.sumOf { it.amount }
-        val spentOnTransport = viewModel.transactions
-            .filter { it.category == Category.TRANSPORT }.sumOf { it.amount }
-        val spentOnEducation = viewModel.transactions
-            .filter { it.category == Category.EDUCATION }.sumOf { it.amount }
-        val spentOnEntertainment = viewModel.transactions
-            .filter { it.category == Category.ENTERTAINMENT }.sumOf { it.amount }
-        val spentOnHealth = viewModel.transactions
-            .filter { it.category == Category.HEALTH }.sumOf { it.amount }
-        val spentOnOther = viewModel.transactions
-            .filter { it.category == Category.OTHER }.sumOf { it.amount }
-
         LazyColumn {
             item {
-                BudgetProgressBar(category = stringResource(R.string.category_hrana), spent = spentOnFood, total = viewModel.userProfile.monthlyBudget)
+                BudgetProgressBar(
+                    category = stringResource(R.string.category_hrana),
+                    spent = spentOnFood,
+                    total = monthlyBudget)
             }
             item {
-                BudgetProgressBar(category = stringResource(R.string.category_transport), spent = spentOnTransport, total = viewModel.userProfile.monthlyBudget)
+                BudgetProgressBar(
+                    category = stringResource(R.string.category_transport),
+                    spent = spentOnTransport,
+                    total = monthlyBudget)
             }
             item {
-                BudgetProgressBar(category = stringResource(R.string.category_obrazovanje), spent = spentOnEducation, total = viewModel.userProfile.monthlyBudget)
+                BudgetProgressBar(
+                    category = stringResource(R.string.category_obrazovanje),
+                    spent = spentOnEducation,
+                    total = monthlyBudget)
             }
             item {
-                BudgetProgressBar(category = stringResource(R.string.category_zabava), spent = spentOnEntertainment, total = viewModel.userProfile.monthlyBudget)
+                BudgetProgressBar(
+                    category = stringResource(R.string.category_zabava),
+                    spent = spentOnEntertainment,
+                    total = monthlyBudget)
             }
             item {
-                BudgetProgressBar(category = stringResource(R.string.category_zdravlje), spent = spentOnHealth, total = viewModel.userProfile.monthlyBudget)
+                BudgetProgressBar(
+                    category = stringResource(R.string.category_zdravlje),
+                    spent = spentOnHealth,
+                    total = monthlyBudget)
             }
             item {
-                BudgetProgressBar(category = stringResource(R.string.category_ostalo), spent = spentOnOther, total = viewModel.userProfile.monthlyBudget)
+                BudgetProgressBar(
+                    category = stringResource(R.string.category_ostalo),
+                    spent = spentOnOther,
+                    total = monthlyBudget)
             }
         }
     }
@@ -77,6 +89,6 @@ fun BudgetScreen(viewModel: FinanceViewModel) {
 @Composable
 fun BudgetScreenPreview() {
     MaterialTheme {
-        BudgetScreen(viewModel = FinanceViewModel())
+        BudgetScreen()
     }
 }

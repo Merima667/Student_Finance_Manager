@@ -13,12 +13,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
+import com.example.student_finance_manager_app.model.Transaction
 import com.example.student_finance_manager_app.presentation.viewmodel.FinanceViewModel
 import com.example.student_finance_manager_app.presentation.ui.screens.profile.component.ProfileHeader
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
 
 @Composable
-fun ProfileScreen(viewModel: FinanceViewModel) {
+fun ProfileScreen(
+    name: String = "Merima",
+    monthlyBudget: Double = 500.0,
+    totalTransactions: Double = 4.0,
+    totalIncome: Double = 300.0,
+    totalExpenses: Double = 45.50,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -32,12 +40,18 @@ fun ProfileScreen(viewModel: FinanceViewModel) {
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_medium))
         )
         ProfileHeader(
-            name = viewModel.userProfile.name,
-            monthlyBudget = viewModel.userProfile.monthlyBudget
+            name = name,
+            monthlyBudget = monthlyBudget
         )
-        StatCard(title = stringResource(R.string.stat_ukupno_transakcija), amount = viewModel.transactions.size.toDouble())
-        StatCard(title = stringResource(R.string.stat_prihodi), amount = viewModel.totalIncome)
-        StatCard(title = stringResource(R.string.stat_rashodi), amount = viewModel.totalExpenses)
+        StatCard(
+            title = stringResource(R.string.stat_ukupno_transakcija),
+            amount = totalTransactions)
+        StatCard(
+            title = stringResource(R.string.stat_prihodi),
+            amount = totalIncome)
+        StatCard(
+            title = stringResource(R.string.stat_rashodi),
+            amount = totalExpenses)
     }
 }
 
@@ -45,6 +59,6 @@ fun ProfileScreen(viewModel: FinanceViewModel) {
 @Composable
 fun ProfileScreenPreview() {
     MaterialTheme {
-        ProfileScreen(viewModel = FinanceViewModel())
+        ProfileScreen()
     }
 }

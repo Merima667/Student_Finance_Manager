@@ -12,16 +12,30 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.RadioButton
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.presentation.viewmodel.FinanceViewModel
 import com.example.student_finance_manager_app.presentation.ui.components.FormField
 
 @Composable
-fun AddTransactionScreen(viewModel: FinanceViewModel) {
+fun AddTransactionScreen() {
+    var titleInput by remember { mutableStateOf("") }
+    var amountInput by remember { mutableStateOf("") }
+    var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
+    var titleError by remember { mutableStateOf<String?>(null) }
+    var amountError by remember { mutableStateOf<String?>(null) }
+
+    val errorNaziv = stringResource(R.string.error_naziv)
+    val errorIznosPrazan = stringResource(R.string.error_iznos_prazan)
+    val errorIznosBroj = stringResource(R.string.error_iznos_broj)
+    val errorIznosVeci = stringResource(R.string.error_iznos_veci)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,29 +50,17 @@ fun AddTransactionScreen(viewModel: FinanceViewModel) {
         )
         FormField(
             label = stringResource(R.string.label_naziv),
-            value = viewModel.titleInput,
-            onValueChange = { viewModel.onTitleChange(it) },
-            isError = viewModel.formError != null && viewModel.titleInput.isBlank(),
-            errorMessage = if (viewModel.formError != null && viewModel.titleInput.isBlank())
-                stringResource(R.string.error_naziv)
-            else null
+            value = titleInput,
+            onValueChange = { titleInput = it; titleError = null },
+            isError = titleError != null,
+            errorMessage = titleError
         )
         FormField(
             label = stringResource(R.string.label_iznos),
-            value = viewModel.amountInput,
-            onValueChange = { viewModel.onAmountChange(it) },
-            isError = viewModel.formError != null && (
-                    viewModel.amountInput.isBlank() ||
-                            viewModel.amountInput.toDoubleOrNull() == null ||
-                            (viewModel.amountInput.toDoubleOrNull() ?: 0.0) <= 0
-                    ),
-            errorMessage = if (viewModel.formError != null && viewModel.amountInput.isBlank())
-                stringResource(R.string.error_iznos_prazan)
-            else if (viewModel.formError != null && viewModel.amountInput.toDoubleOrNull() == null)
-                stringResource(R.string.error_iznos_broj)
-            else if (viewModel.formError != null && viewModel.amountInput.toDoubleOrNull() != null && viewModel.amountInput.toDouble() <= 0)
-                stringResource(R.string.error_iznos_veci)
-            else null
+            value = amountInput,
+            onValueChange = { amountInput = it; amountError = null },
+            isError = amountError != null,
+            errorMessage = amountError
         )
         Text(
             text = stringResource(R.string.tip_transakcije),
@@ -67,8 +69,8 @@ fun AddTransactionScreen(viewModel: FinanceViewModel) {
         )
         Row {
             RadioButton(
-                selected = viewModel.selectedType == TransactionType.INCOME,
-                onClick = { viewModel.onTypeChange(TransactionType.INCOME) }
+                selected = selectedType == TransactionType.INCOME,
+                onClick = { selectedType = TransactionType.INCOME }
             )
             Text(
                 text = stringResource(R.string.prihod),
@@ -78,8 +80,8 @@ fun AddTransactionScreen(viewModel: FinanceViewModel) {
                 )
             )
             RadioButton(
-                selected = viewModel.selectedType == TransactionType.EXPENSE,
-                onClick = { viewModel.onTypeChange(TransactionType.EXPENSE) }
+                selected = selectedType == TransactionType.EXPENSE,
+                onClick = { selectedType = TransactionType.EXPENSE }
             )
             Text(
                 text = stringResource(R.string.rashod),
@@ -90,9 +92,23 @@ fun AddTransactionScreen(viewModel: FinanceViewModel) {
             )
         }
         Button(
-            onClick = { viewModel.addTransaction() },
+            onClick = {
+                titleError = null
+                amountError = null
+                when {
+                    titleInput.isBlank() -> titleError = errorNaziv
+                    amountInput.isBlank() -> amountError = errorIznosPrazan
+                    amountInput.toDoubleOrNull() == null -> amountError = errorIznosBroj
+                    amountInput.toDouble() <= 0 -> amountError = errorIznosVeci
+                    else -> {
+                        titleInput = ""
+                        amountInput = ""
+                        selectedType = TransactionType.EXPENSE
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
-            enabled = viewModel.titleInput.isNotBlank() && viewModel.amountInput.isNotBlank()
+            enabled = titleInput.isNotBlank() && amountInput.isNotBlank()
         ) {
             Text(text = stringResource(R.string.btn_dodaj))
         }
@@ -103,6 +119,6 @@ fun AddTransactionScreen(viewModel: FinanceViewModel) {
 @Composable
 fun AddTransactionScreenPreview() {
     MaterialTheme {
-        AddTransactionScreen(viewModel = FinanceViewModel())
+        AddTransactionScreen()
     }
 }
