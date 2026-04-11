@@ -14,17 +14,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.Category
+import com.example.student_finance_manager_app.model.HardcodedData
+import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.screens.budget.component.BudgetProgressBar
 
 @Composable
 fun BudgetScreen(
-    monthlyBudget: Double = 500.0,
-    spentOnFood: Double = 8.50,
-    spentOnTransport: Double = 2.0,
-    spentOnEducation: Double = 35.0,
-    spentOnEntertainment: Double = 0.0,
-    spentOnHealth: Double = 0.0,
-    spentOnOther: Double = 300.0,
+    monthlyBudget: Double = HardcodedData.defaultUserProfile.monthlyBudget,
+    spentOnFood: Double = HardcodedData.defaultTransactions
+        .filter { it.category == Category.FOOD && it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount },
+    spentOnTransport: Double = HardcodedData.defaultTransactions
+        .filter { it.category == Category.TRANSPORT && it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount },
+    spentOnEducation: Double = HardcodedData.defaultTransactions
+        .filter { it.category == Category.EDUCATION && it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount },
+    spentOnEntertainment: Double = HardcodedData.defaultTransactions
+        .filter { it.category == Category.ENTERTAINMENT && it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount },
+    spentOnHealth: Double = HardcodedData.defaultTransactions
+        .filter { it.category == Category.HEALTH && it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount },
+    spentOnOther: Double = HardcodedData.defaultTransactions
+        .filter { it.category == Category.OTHER && it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount },
     modifier: Modifier = Modifier
 ) {
     Column(

@@ -2,6 +2,7 @@ package com.example.student_finance_manager_app.presentation.ui.screens.transact
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,39 +15,97 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
+import com.example.student_finance_manager_app.model.HardcodedData
 import com.example.student_finance_manager_app.model.Category
 import com.example.student_finance_manager_app.model.Transaction
 import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.screens.transactions.component.TransactionItem
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionScreen(
-    transactions: List<Transaction> = listOf(
-        Transaction(title = "Stipendija", amount = 300.0, type = TransactionType.INCOME, category = Category.OTHER, date = "2026-03-01"),
-        Transaction(title = "Rucak", amount = 8.50, type = TransactionType.EXPENSE, category = Category.FOOD, date = "2026-03-10"),
-        Transaction(title = "Bus karta", amount = 2.0, type = TransactionType.EXPENSE, category = Category.TRANSPORT, date = "2026-03-11"),
-        Transaction(title = "Udzbenik", amount = 35.0, type = TransactionType.EXPENSE, category = Category.EDUCATION, date = "2026-03-12")
-    ),
+    transactions: List<Transaction> = HardcodedData.defaultTransactions,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_medium))
-    ) {
-        Text(
-            text = stringResource(R.string.transactions_title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
-        )
-        if (transactions.isEmpty()) {
-            Text(text = stringResource(R.string.empty_transactions))
-        } else {
-            LazyColumn {
-                items(transactions) { transaction ->
-                    TransactionItem(transaction)
+    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val showScrollToTop by remember {
+        derivedStateOf { listState.firstVisibleItemIndex > 0 }
+    }
+    val filteredTransactions = transactions.filter {
+        it.title.contains(searchQuery, ignoreCase = true)
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(dimensionResource(R.dimen.padding_medium))
+        ) {
+            Text(
+                text = stringResource(R.string.transactions_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
+            )
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Pretraži transakcije") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = dimensionResource(R.dimen.padding_small))
+            )
+            if (filteredTransactions.isEmpty()) {
+                Text(text = stringResource(R.string.empty_transactions))
+            } else {
+                LazyColumn (state = listState) {
+                    items(filteredTransactions) { transaction ->
+                        TransactionItem(
+                            transaction = transaction,
+                            onClick = { selectedTransaction = transaction }
+                        )
+                    }
                 }
+                selectedTransaction?.let { transaction ->
+                    Text(
+                        text = "Odabrano: ${transaction.title}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
+                    )
+                }
+            }
+        }
+        if (showScrollToTop) {
+            FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(dimensionResource(R.dimen.padding_medium))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Idi na vrh"
+                )
             }
         }
     }
