@@ -12,11 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val LightColorScheme = lightColorScheme(
-
-)
-private val DarkColorScheme = darkColorScheme(
-)
+private val LightColorScheme = lightColorScheme()
+private val DarkColorScheme = darkColorScheme()
 
 /*private val LightColorScheme = lightColorScheme(
     primary = Purple40,
@@ -37,7 +34,6 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun Student_Finance_Manager_AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -56,11 +52,4 @@ fun Student_Finance_Manager_AppTheme(
         typography = Typography,
         content = content
     )
-}
-
-fun MaterialTheme(
-    colorScheme: androidx.compose.material3.ColorScheme,
-    typography: kotlin.text.Typography,
-    content: () -> Unit
-) {
 }

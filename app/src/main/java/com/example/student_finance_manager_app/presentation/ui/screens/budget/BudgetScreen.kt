@@ -20,25 +20,50 @@ import com.example.student_finance_manager_app.presentation.ui.screens.budget.co
 
 @Composable
 fun BudgetScreen(
-    monthlyBudget: Double = HardcodedData.defaultUserProfile.monthlyBudget,
-    spentOnFood: Double = HardcodedData.defaultTransactions
+
+    modifier: Modifier = Modifier
+) {
+    val monthlyBudget = HardcodedData.defaultUserProfile.monthlyBudget
+    val spentOnFood = HardcodedData.defaultTransactions
         .filter { it.category == Category.FOOD && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount },
-    spentOnTransport: Double = HardcodedData.defaultTransactions
+        .sumOf { it.amount }
+    val spentOnTransport = HardcodedData.defaultTransactions
         .filter { it.category == Category.TRANSPORT && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount },
-    spentOnEducation: Double = HardcodedData.defaultTransactions
+        .sumOf { it.amount }
+    val spentOnEducation = HardcodedData.defaultTransactions
         .filter { it.category == Category.EDUCATION && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount },
-    spentOnEntertainment: Double = HardcodedData.defaultTransactions
+        .sumOf { it.amount }
+    val spentOnEntertainment = HardcodedData.defaultTransactions
         .filter { it.category == Category.ENTERTAINMENT && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount },
-    spentOnHealth: Double = HardcodedData.defaultTransactions
+        .sumOf { it.amount }
+    val spentOnHealth = HardcodedData.defaultTransactions
         .filter { it.category == Category.HEALTH && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount },
-    spentOnOther: Double = HardcodedData.defaultTransactions
+        .sumOf { it.amount }
+    val spentOnOther = HardcodedData.defaultTransactions
         .filter { it.category == Category.OTHER && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount },
+        .sumOf { it.amount }
+
+    BudgetScreen(
+        monthlyBudget = monthlyBudget,
+        spentOnFood = spentOnFood,
+        spentOnTransport = spentOnTransport,
+        spentOnEducation = spentOnEducation,
+        spentOnEntertainment = spentOnEntertainment,
+        spentOnHealth = spentOnHealth,
+        spentOnOther = spentOnOther,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun BudgetScreen(
+    monthlyBudget: Double,
+    spentOnFood: Double,
+    spentOnTransport: Double,
+    spentOnEducation: Double,
+    spentOnEntertainment: Double,
+    spentOnHealth: Double,
+    spentOnOther: Double,
     modifier: Modifier = Modifier
 ) {
     Column(

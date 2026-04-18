@@ -23,6 +23,7 @@ import com.example.student_finance_manager_app.presentation.ui.components.Transa
 import com.example.student_finance_manager_app.model.HardcodedData
 import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
+import com.example.student_finance_manager_app.model.Transaction
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier) {
@@ -35,6 +36,25 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         .sumOf { it.amount }
     val balance = totalIncome - totalExpenses
 
+    DashboardScreen(
+        name = name,
+        totalIncome = totalIncome,
+        totalExpenses = totalExpenses,
+        balance = balance,
+        transactions = HardcodedData.defaultTransactions,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun DashboardScreen(
+    name: String,
+    totalIncome: Double,
+    totalExpenses: Double,
+    balance: Double,
+    transactions: List<Transaction>,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -75,7 +95,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         )
 
         LazyRow {
-            items(HardcodedData.defaultTransactions) { transaction ->
+            items(transactions) { transaction ->
                 TransactionCard(transaction = transaction)
             }
         }

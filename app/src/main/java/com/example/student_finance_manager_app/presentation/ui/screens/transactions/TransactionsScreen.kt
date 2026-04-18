@@ -16,9 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.HardcodedData
-import com.example.student_finance_manager_app.model.Category
 import com.example.student_finance_manager_app.model.Transaction
-import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.screens.transactions.component.TransactionItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,13 +41,34 @@ fun TransactionScreen(
 ) {
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     var searchQuery by remember { mutableStateOf("") }
+
+    val filteredTransactions = transactions.filter {
+        it.title.contains(searchQuery, ignoreCase = true)
+    }
+
+    TransactionScreen(
+        transactions = filteredTransactions,
+        searchQuery = searchQuery,
+        selectedTransaction = selectedTransaction,
+        onSearchQueryChange = { searchQuery = it },
+        onTransactionClick = { selectedTransaction = it },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun TransactionScreen(
+    transactions: List<Transaction>,
+    searchQuery: String,
+    selectedTransaction: Transaction?,
+    onSearchQueryChange: (String) -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val showScrollToTop by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
-    }
-    val filteredTransactions = transactions.filter {
-        it.title.contains(searchQuery, ignoreCase = true)
     }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -65,20 +84,20 @@ fun TransactionScreen(
             )
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = onSearchQueryChange,
                 label = { Text("Pretraži transakcije") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = dimensionResource(R.dimen.padding_small))
             )
-            if (filteredTransactions.isEmpty()) {
+            if (transactions.isEmpty()) {
                 Text(text = stringResource(R.string.empty_transactions))
             } else {
                 LazyColumn (state = listState) {
-                    items(filteredTransactions) { transaction ->
+                    items(transactions) { transaction ->
                         TransactionItem(
                             transaction = transaction,
-                            onClick = { selectedTransaction = transaction }
+                            onClick = { onTransactionClick(transaction) }
                         )
                     }
                 }
@@ -110,7 +129,6 @@ fun TransactionScreen(
         }
     }
 }
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TransactionScreenPreview() {

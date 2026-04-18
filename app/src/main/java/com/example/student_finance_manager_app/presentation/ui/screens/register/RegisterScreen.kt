@@ -26,7 +26,8 @@ import com.example.student_finance_manager_app.presentation.ui.components.FormFi
 
 @Composable
 fun RegisterScreen(
-    onNavigateToLogin: () -> Unit = {}
+    onNavigateToLogin: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -43,8 +44,61 @@ fun RegisterScreen(
     val errorLozinkaKratka = stringResource(R.string.error_lozinka_kratka)
     val errorLozinkePodudaraju = stringResource(R.string.error_lozinke_podudaraju)
 
+    RegisterScreen(
+        name = name,
+        email = email,
+        password = password,
+        confirmPassword = confirmPassword,
+        nameError = nameError,
+        emailError = emailError,
+        passwordError = passwordError,
+        confirmPasswordError = confirmPasswordError,
+        onNameChange = { name = it; nameError = null },
+        onEmailChange = { email = it; emailError = null },
+        onPasswordChange = { password = it; passwordError = null },
+        onConfirmPasswordChange = { confirmPassword = it; confirmPasswordError = null },
+        onRegister = {
+            nameError = null
+            emailError = null
+            passwordError = null
+            confirmPasswordError = null
+            when {
+                name.isBlank() -> nameError = errorImePrazno
+                email.isBlank() -> emailError = errorEmailPrazan
+                !email.contains("@") -> emailError = errorEmailIspravan
+                password.isBlank() -> passwordError = errorLozinkaPrazna
+                password.length < 6 -> passwordError = errorLozinkaKratka
+                password != confirmPassword -> confirmPasswordError = errorLozinkePodudaraju
+                else -> onNavigateToLogin()
+            }
+        },
+        onNavigateToLogin = onNavigateToLogin,
+        modifier = modifier
+    )
+
+
+}
+
+@Composable
+private fun RegisterScreen(
+    name: String,
+    email: String,
+    password: String,
+    confirmPassword: String,
+    nameError: String?,
+    emailError: String?,
+    passwordError: String?,
+    confirmPasswordError: String?,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onRegister: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_medium))
     ) {
@@ -57,48 +111,34 @@ fun RegisterScreen(
         FormField(
             label = stringResource(R.string.label_ime),
             value = name,
-            onValueChange = { name = it; nameError = null },
+            onValueChange = onNameChange,
             isError = nameError != null,
             errorMessage = nameError
         )
         FormField(
             label = stringResource(R.string.label_email),
             value = email,
-            onValueChange = { email = it; emailError = null },
+            onValueChange = onEmailChange,
             isError = emailError != null,
             errorMessage = emailError
         )
         FormField(
             label = stringResource(R.string.label_lozinka),
             value = password,
-            onValueChange = { password = it; passwordError = null },
+            onValueChange = onPasswordChange,
             isError = passwordError != null,
             errorMessage = passwordError
         )
         FormField(
             label = stringResource(R.string.label_potvrdi_lozinku),
             value = confirmPassword,
-            onValueChange = { confirmPassword = it; confirmPasswordError = null },
+            onValueChange = onConfirmPasswordChange,
             isError = confirmPasswordError != null,
             errorMessage = confirmPasswordError
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
         Button(
-            onClick = {
-                nameError = null
-                emailError = null
-                passwordError = null
-                confirmPasswordError = null
-                when {
-                    name.isBlank() -> nameError = errorImePrazno
-                    email.isBlank() -> emailError = errorEmailPrazan
-                    !email.contains("@") -> emailError = errorEmailIspravan
-                    password.isBlank() -> passwordError = errorLozinkaPrazna
-                    password.length < 6 -> passwordError = errorLozinkaKratka
-                    password != confirmPassword -> confirmPasswordError = errorLozinkePodudaraju
-                    else -> onNavigateToLogin()
-                }
-            },
+            onClick = onRegister,
             modifier = Modifier.fillMaxWidth(),
             enabled = name.isNotBlank() && email.isNotBlank() &&
                     password.isNotBlank() && confirmPassword.isNotBlank()

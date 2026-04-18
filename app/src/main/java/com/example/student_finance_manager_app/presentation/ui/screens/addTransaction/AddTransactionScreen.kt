@@ -24,7 +24,7 @@ import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.components.FormField
 
 @Composable
-fun AddTransactionScreen() {
+fun AddTransactionScreen(modifier: Modifier = Modifier) {
     var titleInput by remember { mutableStateOf("") }
     var amountInput by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
@@ -36,8 +36,49 @@ fun AddTransactionScreen() {
     val errorIznosBroj = stringResource(R.string.error_iznos_broj)
     val errorIznosVeci = stringResource(R.string.error_iznos_veci)
 
+    AddTransactionScreen(
+        titleInput = titleInput,
+        amountInput = amountInput,
+        selectedType = selectedType,
+        titleError = titleError,
+        amountError = amountError,
+        onTitleChange = { titleInput = it; titleError = null },
+        onAmountChange = { amountInput = it; amountError = null },
+        onTypeChange = { selectedType = it },
+        onSubmit = {
+            titleError = null
+            amountError = null
+            when {
+                titleInput.isBlank() -> titleError = errorNaziv
+                amountInput.isBlank() -> amountError = errorIznosPrazan
+                amountInput.toDoubleOrNull() == null -> amountError = errorIznosBroj
+                amountInput.toDouble() <= 0 -> amountError = errorIznosVeci
+                else -> {
+                    titleInput = ""
+                    amountInput = ""
+                    selectedType = TransactionType.EXPENSE
+                }
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun AddTransactionScreen(
+    titleInput: String,
+    amountInput: String,
+    selectedType: TransactionType,
+    titleError: String?,
+    amountError: String?,
+    onTitleChange: (String) -> Unit,
+    onAmountChange: (String) -> Unit,
+    onTypeChange: (TransactionType) -> Unit,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_medium))
             .padding(top = dimensionResource(R.dimen.padding_large))
@@ -51,14 +92,14 @@ fun AddTransactionScreen() {
         FormField(
             label = stringResource(R.string.label_naziv),
             value = titleInput,
-            onValueChange = { titleInput = it; titleError = null },
+            onValueChange = onTitleChange,
             isError = titleError != null,
             errorMessage = titleError
         )
         FormField(
             label = stringResource(R.string.label_iznos),
             value = amountInput,
-            onValueChange = { amountInput = it; amountError = null },
+            onValueChange = onAmountChange,
             isError = amountError != null,
             errorMessage = amountError
         )
@@ -70,7 +111,7 @@ fun AddTransactionScreen() {
         Row {
             RadioButton(
                 selected = selectedType == TransactionType.INCOME,
-                onClick = { selectedType = TransactionType.INCOME }
+                onClick = { onTypeChange(TransactionType.INCOME) }
             )
             Text(
                 text = stringResource(R.string.prihod),
@@ -81,7 +122,7 @@ fun AddTransactionScreen() {
             )
             RadioButton(
                 selected = selectedType == TransactionType.EXPENSE,
-                onClick = { selectedType = TransactionType.EXPENSE }
+                onClick = { onTypeChange(TransactionType.EXPENSE) }
             )
             Text(
                 text = stringResource(R.string.rashod),
@@ -92,21 +133,7 @@ fun AddTransactionScreen() {
             )
         }
         Button(
-            onClick = {
-                titleError = null
-                amountError = null
-                when {
-                    titleInput.isBlank() -> titleError = errorNaziv
-                    amountInput.isBlank() -> amountError = errorIznosPrazan
-                    amountInput.toDoubleOrNull() == null -> amountError = errorIznosBroj
-                    amountInput.toDouble() <= 0 -> amountError = errorIznosVeci
-                    else -> {
-                        titleInput = ""
-                        amountInput = ""
-                        selectedType = TransactionType.EXPENSE
-                    }
-                }
-            },
+            onClick = onSubmit,
             modifier = Modifier.fillMaxWidth(),
             enabled = titleInput.isNotBlank() && amountInput.isNotBlank()
         ) {

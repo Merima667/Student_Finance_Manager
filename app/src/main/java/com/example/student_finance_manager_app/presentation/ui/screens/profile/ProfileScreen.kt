@@ -16,29 +16,52 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import com.example.student_finance_manager_app.model.HardcodedData
 import com.example.student_finance_manager_app.presentation.ui.components.CategoryCard
 import com.example.student_finance_manager_app.model.CategoryItem
+import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.screens.profile.component.ProfileHeader
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
 
 @Composable
 fun ProfileScreen(
-    name: String = HardcodedData.defaultUserProfile.name,
-    monthlyBudget: Double = HardcodedData.defaultUserProfile.monthlyBudget,
-    totalTransactions: Double = HardcodedData.defaultTransactions.size.toDouble(),
-    totalIncome: Double = HardcodedData.defaultTransactions
-        .filter { it.type.name == "INCOME" }
-        .sumOf { it.amount },
-    totalExpenses: Double = HardcodedData.defaultTransactions
-        .filter { it.type.name == "EXPENSE" }
-        .sumOf { it.amount },
+    modifier: Modifier = Modifier
+) {
+    val name = HardcodedData.defaultUserProfile.name
+    val monthlyBudget = HardcodedData.defaultUserProfile.monthlyBudget
+    val totalTransactions = HardcodedData.defaultTransactions.size.toDouble()
+    val totalIncome = HardcodedData.defaultTransactions
+        .filter { it.type == TransactionType.INCOME }
+        .sumOf { it.amount }
+    val totalExpenses = HardcodedData.defaultTransactions
+        .filter { it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount }
+    val categories = HardcodedData.defaultCategories
+
+    ProfileScreen(
+        name = name,
+        monthlyBudget = monthlyBudget,
+        totalTransactions = totalTransactions,
+        totalIncome = totalIncome,
+        totalExpenses = totalExpenses,
+        categories = categories,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ProfileScreen(
+    name: String,
+    monthlyBudget: Double,
+    totalTransactions: Double,
+    totalIncome: Double,
+    totalExpenses: Double,
+    categories: List<CategoryItem>,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(dimensionResource(R.dimen.padding_medium)),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -72,7 +95,7 @@ fun ProfileScreen(
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
         )
         LazyRow {
-            items(HardcodedData.defaultCategories) { category ->
+            items(categories) { category ->
                 CategoryCard(
                     categoryName = category.name,
                     amount = category.amount
