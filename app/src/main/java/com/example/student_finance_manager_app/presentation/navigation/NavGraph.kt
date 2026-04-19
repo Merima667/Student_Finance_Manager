@@ -5,6 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.student_finance_manager_app.presentation.ui.screens.transactions.TransactionDetailScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.addTransaction.AddTransactionScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.budget.BudgetScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.dashboard.DashboardScreen
@@ -25,11 +28,8 @@ fun NavGraph(
         modifier = modifier
     ) {
         composable(Screen.Login.route) {
-            println("NAVGRAPH LOGIN SE RENDERA")
-
             LoginScreen(
                 onLoginSuccess = {
-                    println("CLICK LOGIN")
                     navController.navigate(Screen.Dashboard.route)
                 },
                 onNavigateToRegister = {
@@ -48,7 +48,32 @@ fun NavGraph(
             DashboardScreen()
         }
         composable(Screen.Transactions.route) {
-            TransactionScreen()
+            TransactionScreen(
+                onTransactionClick = { transition ->
+                    navController.navigate(
+                        Screen.TransactionDetail.createRoute(
+                            transactionId = transition.id.toString(),
+                            transactionTitle = transition.title
+                        )
+                    )
+                }
+            )
+        }
+        composable(
+            route = Screen.TransactionDetail.route,
+            arguments = listOf(
+                navArgument("transactionId") { type = NavType.StringType },
+                navArgument("transactionTitle") { type = NavType.StringType }
+            )
+        ) {
+            backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getString("transactionId") ?: ""
+            val transactionTitle = backStackEntry.arguments?.getString("transactionTitle") ?: ""
+            TransactionDetailScreen(
+                transactionId = transactionId,
+                transactionTitle = transactionTitle,
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
         composable(Screen.Budget.route) {
             BudgetScreen()

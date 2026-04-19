@@ -9,6 +9,10 @@ sealed class Screen(val route: String) {
     data object Profile: Screen("profile_screen")
     data object AddTransaction: Screen("add_transaction_screen")
 
+    data object TransactionDetail : Screen("transaction_detail/{transactionId}/{transactionTitle}") {
+        fun createRoute(transactionId: String, transactionTitle: String) =
+            "transaction_detail/$transactionId/$transactionTitle"
+    }
     companion object {
         fun getBottomNavRoutes(): List<String> {
             return listOf(

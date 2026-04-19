@@ -37,9 +37,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun TransactionScreen(
     transactions: List<Transaction> = HardcodedData.defaultTransactions,
+    onTransactionClick: (Transaction) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredTransactions = transactions.filter {
@@ -49,9 +49,8 @@ fun TransactionScreen(
     TransactionScreen(
         transactions = filteredTransactions,
         searchQuery = searchQuery,
-        selectedTransaction = selectedTransaction,
         onSearchQueryChange = { searchQuery = it },
-        onTransactionClick = { selectedTransaction = it },
+        onTransactionClick = onTransactionClick,
         modifier = modifier
     )
 }
@@ -60,7 +59,6 @@ fun TransactionScreen(
 private fun TransactionScreen(
     transactions: List<Transaction>,
     searchQuery: String,
-    selectedTransaction: Transaction?,
     onSearchQueryChange: (String) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
@@ -100,13 +98,6 @@ private fun TransactionScreen(
                             onClick = { onTransactionClick(transaction) }
                         )
                     }
-                }
-                selectedTransaction?.let { transaction ->
-                    Text(
-                        text = "Odabrano: ${transaction.title}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
-                    )
                 }
             }
         }
