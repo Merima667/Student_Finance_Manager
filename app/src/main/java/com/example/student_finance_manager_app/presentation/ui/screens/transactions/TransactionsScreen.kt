@@ -2,6 +2,7 @@ package com.example.student_finance_manager_app.presentation.ui.screens.transact
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,38 +15,115 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
+import com.example.student_finance_manager_app.model.HardcodedData
+import com.example.student_finance_manager_app.model.Transaction
 import com.example.student_finance_manager_app.presentation.ui.screens.transactions.component.TransactionItem
-import com.example.student_finance_manager_app.presentation.viewmodel.FinanceViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 
 @Composable
-fun TransactionScreen(viewModel: FinanceViewModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_medium))
-    ) {
-        Text(
-            text = stringResource(R.string.transactions_title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
-        )
-        if (viewModel.transactions.isEmpty()) {
-            Text(text = stringResource(R.string.empty_transactions))
-        } else {
-            LazyColumn {
-                items(viewModel.transactions) { transaction ->
-                    TransactionItem(transaction)
+fun TransactionScreen(
+    transactions: List<Transaction> = HardcodedData.defaultTransactions,
+    onTransactionClick: (Transaction) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredTransactions = transactions.filter {
+        it.title.contains(searchQuery, ignoreCase = true)
+    }
+
+    TransactionScreen(
+        transactions = filteredTransactions,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { searchQuery = it },
+        onTransactionClick = onTransactionClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun TransactionScreen(
+    transactions: List<Transaction>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val showScrollToTop by remember {
+        derivedStateOf { listState.firstVisibleItemIndex > 0 }
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(dimensionResource(R.dimen.padding_medium))
+        ) {
+            Text(
+                text = stringResource(R.string.transactions_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
+            )
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                label = { Text("Pretraži transakcije") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = dimensionResource(R.dimen.padding_small))
+            )
+            if (transactions.isEmpty()) {
+                Text(text = stringResource(R.string.empty_transactions))
+            } else {
+                LazyColumn (state = listState) {
+                    items(transactions) { transaction ->
+                        TransactionItem(
+                            transaction = transaction,
+                            onClick = { onTransactionClick(transaction) }
+                        )
+                    }
                 }
+            }
+        }
+        if (showScrollToTop) {
+            FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(dimensionResource(R.dimen.padding_medium))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Idi na vrh"
+                )
             }
         }
     }
 }
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun TransactionScreenPreview() {
     MaterialTheme {
-        TransactionScreen(viewModel = FinanceViewModel())
+        TransactionScreen()
     }
 }

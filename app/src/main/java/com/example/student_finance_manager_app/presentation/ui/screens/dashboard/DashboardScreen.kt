@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.student_finance_manager_app.presentation.viewmodel.FinanceViewModel
 import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -18,10 +17,44 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import com.example.student_finance_manager_app.presentation.ui.components.TransactionCard
+import com.example.student_finance_manager_app.model.HardcodedData
+import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
+import com.example.student_finance_manager_app.model.Transaction
 
 @Composable
-fun DashboardScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier) {
+fun DashboardScreen(modifier: Modifier = Modifier) {
+    val name = HardcodedData.defaultUserProfile.name
+    val totalIncome = HardcodedData.defaultTransactions
+        .filter { it.type == TransactionType.INCOME }
+        .sumOf { it.amount }
+    val totalExpenses = HardcodedData.defaultTransactions
+        .filter { it.type == TransactionType.EXPENSE }
+        .sumOf { it.amount }
+    val balance = totalIncome - totalExpenses
+
+    DashboardScreen(
+        name = name,
+        totalIncome = totalIncome,
+        totalExpenses = totalExpenses,
+        balance = balance,
+        transactions = HardcodedData.defaultTransactions,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun DashboardScreen(
+    name: String,
+    totalIncome: Double,
+    totalExpenses: Double,
+    balance: Double,
+    transactions: List<Transaction>,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -41,14 +74,29 @@ fun DashboardScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier) 
                 modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
             ) {
                 Text(
-                    text = stringResource(R.string.dashboard_greeting, viewModel.userProfile.name),
+                    text = stringResource(R.string.dashboard_greeting, name),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
-                StatCard(title = stringResource(R.string.stat_balans), amount = viewModel.balance)
-                StatCard(title = stringResource(R.string.stat_prihodi), amount = viewModel.totalIncome)
-                StatCard(title = stringResource(R.string.stat_rashodi), amount = viewModel.totalExpenses)
+                StatCard(title = stringResource(R.string.stat_balans), amount = balance)
+                StatCard(title = stringResource(R.string.stat_prihodi), amount = totalIncome)
+                StatCard(title = stringResource(R.string.stat_rashodi), amount = totalExpenses)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
+
+        Text(
+            text = "Zadnje transakcije",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_small))
+        )
+
+        LazyRow {
+            items(transactions) { transaction ->
+                TransactionCard(transaction = transaction)
             }
         }
     }
@@ -58,6 +106,6 @@ fun DashboardScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier) 
 @Composable
 fun DashboardScreenPreview() {
     MaterialTheme {
-        DashboardScreen(viewModel = FinanceViewModel())
+        DashboardScreen()
     }
 }

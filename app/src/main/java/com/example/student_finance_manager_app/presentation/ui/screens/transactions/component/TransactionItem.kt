@@ -12,15 +12,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.clickable
 import com.example.student_finance_manager_app.model.Transaction
 import com.example.student_finance_manager_app.model.TransactionType
 
 @Composable
-fun TransactionItem(transaction: Transaction) {
+fun TransactionItem(
+        transaction: Transaction,
+        onClick: () -> Unit = {}
+    ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
