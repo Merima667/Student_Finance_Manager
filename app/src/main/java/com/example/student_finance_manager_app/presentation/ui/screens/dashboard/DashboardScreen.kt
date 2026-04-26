@@ -1,49 +1,73 @@
 package com.example.student_finance_manager_app.presentation.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.material3.Text
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.student_finance_manager_app.R
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import com.example.student_finance_manager_app.presentation.ui.components.TransactionCard
-import com.example.student_finance_manager_app.model.HardcodedData
-import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.presentation.ui.components.StatCard
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.presentation.ui.components.StatCard
+import com.example.student_finance_manager_app.presentation.ui.components.TransactionCard
+import com.example.student_finance_manager_app.presentation.viewmodel.dashboard.DashboardNavigationEvent
+import com.example.student_finance_manager_app.presentation.viewmodel.dashboard.DashboardUiState
+import com.example.student_finance_manager_app.presentation.viewmodel.dashboard.DashboardViewModel
 
 @Composable
-fun DashboardScreen(modifier: Modifier = Modifier) {
-    val name = HardcodedData.defaultUserProfile.name
-    val totalIncome = HardcodedData.defaultTransactions
-        .filter { it.type == TransactionType.INCOME }
-        .sumOf { it.amount }
-    val totalExpenses = HardcodedData.defaultTransactions
-        .filter { it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val balance = totalIncome - totalExpenses
+fun DashboardScreen(
+    viewModel: DashboardViewModel,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    DashboardScreen(
-        name = name,
-        totalIncome = totalIncome,
-        totalExpenses = totalExpenses,
-        balance = balance,
-        transactions = HardcodedData.defaultTransactions,
-        modifier = modifier
-    )
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                DashboardNavigationEvent.Navigate -> {}
+                DashboardNavigationEvent.NavigateBack -> {}
+            }
+        }
+    }
+
+    when(uiState) {
+        is DashboardUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is DashboardUiState.Error -> {
+            Text(text = (uiState as DashboardUiState.Error).message)
+        }
+
+        is DashboardUiState.Success -> {
+            val data = (uiState as DashboardUiState.Success).dashboardData
+            DashboardScreen(
+                name = data.name,
+                totalIncome = data.totalIncome,
+                totalExpenses = data.totalExpanses,
+                balance = data.balance,
+                transactions = data.transactions,
+                modifier = modifier
+            )
+        }
+        else -> {}
+    }
 }
 
 @Composable
@@ -106,6 +130,12 @@ private fun DashboardScreen(
 @Composable
 fun DashboardScreenPreview() {
     MaterialTheme {
-        DashboardScreen()
+        DashboardScreen(
+            name = "Student",
+            totalIncome = 1000.0,
+            totalExpenses = 500.0,
+            balance = 500.0,
+            transactions = emptyList()
+        )
     }
 }

@@ -1,53 +1,73 @@
 package com.example.student_finance_manager_app.presentation.ui.screens.profile
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.lazy.items
-import com.example.student_finance_manager_app.model.HardcodedData
-import com.example.student_finance_manager_app.presentation.ui.components.CategoryCard
 import com.example.student_finance_manager_app.model.CategoryItem
-import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.presentation.ui.screens.profile.component.ProfileHeader
+import com.example.student_finance_manager_app.presentation.ui.components.CategoryCard
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
+import com.example.student_finance_manager_app.presentation.ui.screens.profile.component.ProfileHeader
+import com.example.student_finance_manager_app.presentation.viewmodel.profile.ProfileNavigationEvent
+import com.example.student_finance_manager_app.presentation.viewmodel.profile.ProfileUiState
+import com.example.student_finance_manager_app.presentation.viewmodel.profile.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
+    viewModel: ProfileViewModel,
     modifier: Modifier = Modifier
 ) {
-    val name = HardcodedData.defaultUserProfile.name
-    val monthlyBudget = HardcodedData.defaultUserProfile.monthlyBudget
-    val totalTransactions = HardcodedData.defaultTransactions.size.toDouble()
-    val totalIncome = HardcodedData.defaultTransactions
-        .filter { it.type == TransactionType.INCOME }
-        .sumOf { it.amount }
-    val totalExpenses = HardcodedData.defaultTransactions
-        .filter { it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val categories = HardcodedData.defaultCategories
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ProfileScreen(
-        name = name,
-        monthlyBudget = monthlyBudget,
-        totalTransactions = totalTransactions,
-        totalIncome = totalIncome,
-        totalExpenses = totalExpenses,
-        categories = categories,
-        modifier = modifier
-    )
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when(event) {
+                ProfileNavigationEvent.Navigate -> {}
+                ProfileNavigationEvent.NavigateBack -> {}
+            }
+        }
+    }
+
+    when(uiState) {
+        is ProfileUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is ProfileUiState.Error -> {
+            Text(text = (uiState as ProfileUiState.Error).message)
+        }
+
+        is ProfileUiState.Success -> {
+            val data = (uiState as ProfileUiState.Success).profileData
+            ProfileScreen(
+                name = data.name,
+                monthlyBudget = data.monthlyBudget,
+                totalTransactions = data.totalTransactions,
+                totalIncome = data.totalIncome,
+                totalExpenses = data.totalExpenses,
+                categories = data.categories,
+                modifier = modifier
+            )
+        }
+        else -> {}
+    }
 }
 
 @Composable
@@ -109,6 +129,13 @@ private fun ProfileScreen(
 @Composable
 fun ProfileScreenPreview() {
     MaterialTheme {
-        ProfileScreen()
+        ProfileScreen(
+            name = "Student",
+            monthlyBudget = 1000.0,
+            totalTransactions = 10.0,
+            totalIncome = 800.0,
+            totalExpenses = 300.0,
+            categories = emptyList()
+        )
     }
 }

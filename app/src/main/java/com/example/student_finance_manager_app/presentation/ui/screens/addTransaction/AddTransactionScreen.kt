@@ -1,67 +1,87 @@
 package com.example.student_finance_manager_app.presentation.ui.screens.addTransaction
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.RadioButton
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.components.FormField
+import com.example.student_finance_manager_app.presentation.viewmodel.add_transaction.AddTransactionNavigationEvent
+import com.example.student_finance_manager_app.presentation.viewmodel.add_transaction.AddTransactionUiState
+import com.example.student_finance_manager_app.presentation.viewmodel.add_transaction.AddTransactionViewModel
 
 @Composable
-fun AddTransactionScreen(modifier: Modifier = Modifier) {
-    var titleInput by remember { mutableStateOf("") }
-    var amountInput by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
-    var titleError by remember { mutableStateOf<String?>(null) }
-    var amountError by remember { mutableStateOf<String?>(null) }
+fun AddTransactionScreen(
+    viewModel: AddTransactionViewModel,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val errorNaziv = stringResource(R.string.error_naziv)
-    val errorIznosPrazan = stringResource(R.string.error_iznos_prazan)
-    val errorIznosBroj = stringResource(R.string.error_iznos_broj)
-    val errorIznosVeci = stringResource(R.string.error_iznos_veci)
+    var titleInput by rememberSaveable { mutableStateOf("") }
+    var amountInput by rememberSaveable { mutableStateOf("") }
+    var selectedType by rememberSaveable { mutableStateOf(TransactionType.EXPENSE) }
 
-    AddTransactionScreen(
-        titleInput = titleInput,
-        amountInput = amountInput,
-        selectedType = selectedType,
-        titleError = titleError,
-        amountError = amountError,
-        onTitleChange = { titleInput = it; titleError = null },
-        onAmountChange = { amountInput = it; amountError = null },
-        onTypeChange = { selectedType = it },
-        onSubmit = {
-            titleError = null
-            amountError = null
-            when {
-                titleInput.isBlank() -> titleError = errorNaziv
-                amountInput.isBlank() -> amountError = errorIznosPrazan
-                amountInput.toDoubleOrNull() == null -> amountError = errorIznosBroj
-                amountInput.toDouble() <= 0 -> amountError = errorIznosVeci
-                else -> {
-                    titleInput = ""
-                    amountInput = ""
-                    selectedType = TransactionType.EXPENSE
-                }
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                AddTransactionNavigationEvent.Navigate -> {}
+                AddTransactionNavigationEvent.NavigateBack -> {}
             }
-        },
-        modifier = modifier
-    )
+        }
+    }
+
+    when(uiState) {
+        is AddTransactionUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is AddTransactionUiState.Error -> {
+            AddTransactionScreen(
+                titleInput = titleInput,
+                amountInput = amountInput,
+                selectedType = selectedType,
+                error = (uiState as AddTransactionUiState.Error).message,
+                onTitleChange = { titleInput = it; viewModel.resetUiState() },
+                onAmountChange = { amountInput = it; viewModel.resetUiState() },
+                onTypeChange = { selectedType = it },
+                onSubmit = { viewModel.addTransaction(titleInput, amountInput, selectedType) },
+                modifier = modifier
+            )
+        }
+        else -> {
+            AddTransactionScreen(
+                titleInput = titleInput,
+                amountInput = amountInput,
+                selectedType = selectedType,
+                error = null,
+                onTitleChange = { titleInput = it },
+                onAmountChange = { amountInput = it },
+                onTypeChange = { selectedType = it },
+                onSubmit = { viewModel.addTransaction(titleInput, amountInput, selectedType) },
+                modifier = modifier
+            )
+        }
+    }
 }
 
 @Composable
@@ -69,8 +89,7 @@ private fun AddTransactionScreen(
     titleInput: String,
     amountInput: String,
     selectedType: TransactionType,
-    titleError: String?,
-    amountError: String?,
+    error: String?,
     onTitleChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
@@ -93,15 +112,15 @@ private fun AddTransactionScreen(
             label = stringResource(R.string.label_naziv),
             value = titleInput,
             onValueChange = onTitleChange,
-            isError = titleError != null,
-            errorMessage = titleError
+            isError = error != null,
+            errorMessage = error
         )
         FormField(
             label = stringResource(R.string.label_iznos),
             value = amountInput,
             onValueChange = onAmountChange,
-            isError = amountError != null,
-            errorMessage = amountError
+            isError = error != null,
+            errorMessage = error
         )
         Text(
             text = stringResource(R.string.tip_transakcije),
@@ -146,6 +165,15 @@ private fun AddTransactionScreen(
 @Composable
 fun AddTransactionScreenPreview() {
     MaterialTheme {
-        AddTransactionScreen()
+        AddTransactionScreen(
+            titleInput = "",
+            amountInput = "",
+            selectedType = TransactionType.EXPENSE,
+            error = null,
+            onTitleChange = {},
+            onAmountChange = {},
+            onTypeChange = {},
+            onSubmit = {}
+        )
     }
 }
