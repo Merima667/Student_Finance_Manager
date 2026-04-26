@@ -16,7 +16,9 @@ import com.example.student_finance_manager_app.presentation.navigation.Screen
 import com.example.student_finance_manager_app.presentation.navigation.Screen.Companion.getBottomNavRoutes
 import com.example.student_finance_manager_app.presentation.navigation.BottomNavBar
 import com.example.student_finance_manager_app.presentation.theme.Student_Finance_Manager_AppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
