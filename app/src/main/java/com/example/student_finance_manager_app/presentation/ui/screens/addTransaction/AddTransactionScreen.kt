@@ -45,7 +45,7 @@ fun AddTransactionScreen(
         viewModel.navigationEvent.collect { event ->
             when (event) {
                 AddTransactionNavigationEvent.Navigate -> {}
-                AddTransactionNavigationEvent.NavigateBack -> {}
+                AddTransactionNavigationEvent.NavigateBack -> onNavigateBack()
             }
         }
     }
@@ -56,7 +56,7 @@ fun AddTransactionScreen(
         }
 
         is AddTransactionUiState.Error -> {
-            AddTransactionScreen(
+            /*AddTransactionScreen(
                 titleInput = titleInput,
                 amountInput = amountInput,
                 selectedType = selectedType,
@@ -66,7 +66,11 @@ fun AddTransactionScreen(
                 onTypeChange = { selectedType = it },
                 onSubmit = { viewModel.addTransaction(titleInput, amountInput, selectedType) },
                 modifier = modifier
-            )
+            )*/
+            /*ErrorScreen(
+                errorMessage = ...,
+                buttonCLick = viewModel.resetUiState()
+            )*/
         }
         else -> {
             AddTransactionScreen(

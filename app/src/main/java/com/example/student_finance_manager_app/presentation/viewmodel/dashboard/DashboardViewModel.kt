@@ -1,11 +1,10 @@
 package com.example.student_finance_manager_app.presentation.viewmodel.dashboard
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.student_finance_manager_app.model.HardcodedData
-import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.model.repository.FakeDashboardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor() : ViewModel() {
+    private val repository = FakeDashboardRepository()
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Init)
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
@@ -29,30 +29,28 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
     private fun loadDashboardData() {
         viewModelScope.launch {
             _uiState.value = DashboardUiState.Loading
-
-            val transactions = HardcodedData.defaultTransactions
-            val name = HardcodedData.defaultUserProfile.name
-            val totalIncome = transactions
-                .filter { it.type == TransactionType.INCOME }
-                .sumOf { it.amount }
-            val totalExpanses = transactions
-                .filter { it.type == TransactionType.EXPENSE }
-                .sumOf { it.amount }
-            val balance = totalIncome - totalExpanses
-
-            _uiState.value = DashboardUiState.Success(
-                dashboardData = DashboardData(
-                    name = name,
-                    totalIncome = totalIncome,
-                    totalExpanses = totalExpanses,
-                    balance = balance,
-                    transactions = transactions
+            try{
+                val data = repository.getDashboardData()
+                _uiState.value = DashboardUiState.Success(
+                    dashboardData = DashboardData(
+                        name = data.name,
+                        totalIncome = data.totalIncome,
+                        totalExpanses = data.totalExpanses,
+                        balance = data.balance,
+                        transactions = data.transactions
+                    )
                 )
-            )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IllegalStateException) {
+                _uiState.value = DashboardUiState.Error(
+                    e.message ?: "Failed to load dashboard."
+                )
+            }
         }
     }
 
     fun resetUiState() {
-        _uiState.value = DashboardUiState.Init
+        loadDashboardData()
     }
 }

@@ -42,6 +42,7 @@ class AddTransactionViewModel @Inject constructor() : ViewModel() {
                 }
                 else -> {
                     _uiState.value = AddTransactionUiState.Success
+                    //transactionrepository.addTransaction(title, amount);
                     _navigationEvent.send(AddTransactionNavigationEvent.NavigateBack)
                 }
             }
