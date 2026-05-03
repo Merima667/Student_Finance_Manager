@@ -3,7 +3,9 @@ package com.example.student_finance_manager_app.presentation.viewmodel.add_trans
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.model.repository.FakeAddTransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor() : ViewModel() {
+    private val repository = FakeAddTransactionRepository()
     private val _uiState = MutableStateFlow<AddTransactionUiState>(AddTransactionUiState.Init)
     val uiState: StateFlow<AddTransactionUiState> = _uiState.asStateFlow()
 
@@ -41,12 +44,28 @@ class AddTransactionViewModel @Inject constructor() : ViewModel() {
                     _uiState.value = AddTransactionUiState.Error("Iznos mora biti veći od 0")
                 }
                 else -> {
-                    _uiState.value = AddTransactionUiState.Success
-                    //transactionrepository.addTransaction(title, amount);
-                    _navigationEvent.send(AddTransactionNavigationEvent.NavigateBack)
+                    try{
+                        saveTransaction(title, amount.toDouble(), type)
+                        _uiState.value = AddTransactionUiState.Success
+                        _navigationEvent.send(AddTransactionNavigationEvent.NavigateBack)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: IllegalStateException) {
+                        _uiState.value = AddTransactionUiState.Error(
+                            e.message ?: "Failed to save transaction."
+                        )
+                    }
                 }
             }
         }
+    }
+
+    private suspend fun saveTransaction(
+        title: String,
+        amount: Double,
+        type: TransactionType
+    ) {
+        repository.saveTransaction(title, amount, type)
     }
 
     fun resetUiState() {

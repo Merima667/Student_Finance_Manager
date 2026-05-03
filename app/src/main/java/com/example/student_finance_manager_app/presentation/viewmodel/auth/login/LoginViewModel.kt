@@ -3,7 +3,9 @@ package com.example.student_finance_manager_app.presentation.viewmodel.auth.logi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +24,7 @@ class LoginViewModel @Inject constructor() : ViewModel() {
     fun onLoginClick(email: String, password: String) {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
+            delay(1500)
             if(email == "student@gmail.com" && password == "123456") {
                 _uiState.value = LoginUiState.Success(isLoggedIn = true)
                 _navigationEvent.send(LoginNavigationEvent.Navigate)

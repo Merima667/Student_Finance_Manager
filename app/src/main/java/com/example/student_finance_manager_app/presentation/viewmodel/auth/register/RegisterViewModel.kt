@@ -3,7 +3,9 @@ package com.example.student_finance_manager_app.presentation.viewmodel.auth.regi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +24,7 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
     fun onRegisterClick(fullName: String, email: String, password: String) {
         viewModelScope.launch {
             _uiState.value = RegisterUiState.Loading
+            delay(1500)
             if (fullName.isBlank() || email.isBlank() || password.isBlank()) {
                 _uiState.value = RegisterUiState.Error("Please fill in all fields.")
             } else {

@@ -36,6 +36,7 @@ fun DashboardScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val financeTip by viewModel.financeTip.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.collect { event ->
@@ -63,6 +64,7 @@ fun DashboardScreen(
                 totalExpenses = data.totalExpanses,
                 balance = data.balance,
                 transactions = data.transactions,
+                financeTip = financeTip,
                 modifier = modifier
             )
         }
@@ -77,6 +79,7 @@ private fun DashboardScreen(
     totalExpenses: Double,
     balance: Double,
     transactions: List<Transaction>,
+    financeTip: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -111,6 +114,19 @@ private fun DashboardScreen(
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
 
+        if (financeTip.isNotEmpty()) {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Tip: $financeTip",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
+                )
+            }
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
+        }
+
         Text(
             text = "Zadnje transakcije",
             style = MaterialTheme.typography.titleMedium,
@@ -135,7 +151,8 @@ fun DashboardScreenPreview() {
             totalIncome = 1000.0,
             totalExpenses = 500.0,
             balance = 500.0,
-            transactions = emptyList()
+            transactions = emptyList(),
+            financeTip = "Track your daily expenses to stay on budget"
         )
     }
 }
