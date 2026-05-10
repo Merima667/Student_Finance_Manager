@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                             BottomNavBar(navController = navController)
                         }
                     }
-                ) { innerPadding ->
+                ) { innerPadding:androidx.compose.foundation.layout.PaddingValues ->
                     NavGraph(
                         navController = navController,
                         startDestination = Screen.Login.route,

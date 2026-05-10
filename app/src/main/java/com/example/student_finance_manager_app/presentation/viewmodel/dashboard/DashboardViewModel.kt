@@ -2,7 +2,8 @@ package com.example.student_finance_manager_app.presentation.viewmodel.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.student_finance_manager_app.model.repository.FakeDashboardRepository
+import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.model.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -17,8 +18,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor() : ViewModel() {
-    private val repository = FakeDashboardRepository()
+class DashboardViewModel @Inject constructor(
+    private val repository: TransactionRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Init)
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
@@ -37,16 +39,25 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             _uiState.value = DashboardUiState.Loading
             try{
-                val data = repository.getDashboardData()
-                _uiState.value = DashboardUiState.Success(
-                    dashboardData = DashboardData(
-                        name = data.name,
-                        totalIncome = data.totalIncome,
-                        totalExpanses = data.totalExpanses,
-                        balance = data.balance,
-                        transactions = data.transactions
+                repository.getAllTransactions().collect { transactions ->
+                    val totalIncome = transactions
+                        .filter { it.type == TransactionType.INCOME }
+                        .sumOf { it.amount }
+                    val totalExpenses = transactions
+                        .filter { it.type == TransactionType.EXPENSE }
+                        .sumOf { it.amount }
+                    val balance = totalIncome - totalExpenses
+
+                    _uiState.value = DashboardUiState.Success(
+                        dashboardData = DashboardData(
+                            name = "Student",
+                            totalIncome = totalIncome,
+                            totalExpanses = totalExpenses,
+                            balance = balance,
+                            transactions = transactions
+                        )
                     )
-                )
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IllegalStateException) {

@@ -2,8 +2,10 @@ package com.example.student_finance_manager_app.presentation.viewmodel.add_trans
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.student_finance_manager_app.model.Category
+import com.example.student_finance_manager_app.model.Transaction
 import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.model.repository.FakeAddTransactionRepository
+import com.example.student_finance_manager_app.model.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -15,8 +17,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddTransactionViewModel @Inject constructor() : ViewModel() {
-    private val repository = FakeAddTransactionRepository()
+class AddTransactionViewModel @Inject constructor(
+    private val repository: TransactionRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow<AddTransactionUiState>(AddTransactionUiState.Init)
     val uiState: StateFlow<AddTransactionUiState> = _uiState.asStateFlow()
 
@@ -65,7 +68,14 @@ class AddTransactionViewModel @Inject constructor() : ViewModel() {
         amount: Double,
         type: TransactionType
     ) {
-        repository.saveTransaction(title, amount, type)
+        val transaction = Transaction(
+            title = title,
+            amount = amount,
+            type = type,
+            category = Category.OTHER,
+            date = System.currentTimeMillis().toString()
+        )
+        repository.insertTransaction(transaction)
     }
 
     fun resetUiState() {
