@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.transactions.component.TransactionItem
 import com.example.student_finance_manager_app.presentation.viewmodel.transaction.TransactionNavigationEvent
 import com.example.student_finance_manager_app.presentation.viewmodel.transaction.TransactionUiState
@@ -56,11 +57,13 @@ fun TransactionScreen(
 
     when(uiState) {
         is TransactionUiState.Loading -> {
-            CircularProgressIndicator()
+            LoadingScreen()
         }
-
         is TransactionUiState.Error -> {
-            Text(text = (uiState as TransactionUiState.Error).message)
+            ErrorScreen(
+                errorMessage = (uiState as TransactionUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
         }
 
         is TransactionUiState.Success -> {

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +23,8 @@ import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.CategoryItem
 import com.example.student_finance_manager_app.presentation.ui.components.CategoryCard
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.profile.component.ProfileHeader
 import com.example.student_finance_manager_app.presentation.viewmodel.profile.ProfileNavigationEvent
 import com.example.student_finance_manager_app.presentation.viewmodel.profile.ProfileUiState
@@ -47,11 +48,13 @@ fun ProfileScreen(
 
     when(uiState) {
         is ProfileUiState.Loading -> {
-            CircularProgressIndicator()
+            LoadingScreen()
         }
-
         is ProfileUiState.Error -> {
-            Text(text = (uiState as ProfileUiState.Error).message)
+            ErrorScreen(
+                errorMessage = (uiState as ProfileUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
         }
 
         is ProfileUiState.Success -> {

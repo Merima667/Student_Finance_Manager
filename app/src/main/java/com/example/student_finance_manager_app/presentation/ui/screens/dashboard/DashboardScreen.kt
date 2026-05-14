@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +25,8 @@ import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.Transaction
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
 import com.example.student_finance_manager_app.presentation.ui.components.TransactionCard
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.viewmodel.dashboard.DashboardNavigationEvent
 import com.example.student_finance_manager_app.presentation.viewmodel.dashboard.DashboardUiState
 import com.example.student_finance_manager_app.presentation.viewmodel.dashboard.DashboardViewModel
@@ -49,11 +50,14 @@ fun DashboardScreen(
 
     when(uiState) {
         is DashboardUiState.Loading -> {
-            CircularProgressIndicator()
+            LoadingScreen()
         }
 
         is DashboardUiState.Error -> {
-            Text(text = (uiState as DashboardUiState.Error).message)
+            ErrorScreen(
+                errorMessage = (uiState as DashboardUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
         }
 
         is DashboardUiState.Success -> {

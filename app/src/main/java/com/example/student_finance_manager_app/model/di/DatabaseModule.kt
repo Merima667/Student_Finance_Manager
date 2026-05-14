@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.student_finance_manager_app.model.data.local.dao.*
 import com.example.student_finance_manager_app.model.data.local.db.AppDatabase
+import com.example.student_finance_manager_app.model.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -56,5 +57,44 @@ object DatabaseModule {
     }
 
 
+    @Provides
+    @Singleton
+    fun provideTransactionRepository(
+        transactionDao: TransactionDao
+    ): TransactionRepository {
+        return TransactionRepositoryImpl(transactionDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBudgetRepository(
+        budgetDao: BudgetDao
+    ): BudgetRepository {
+        return BudgetRepositoryImpl(budgetDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserProfileRepository(
+        userProfileDao: UserProfileDao
+    ): UserProfileRepository {
+        return UserProfileRepositoryImpl(userProfileDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryRepository(
+        categoryDao: CategoryDao
+    ): CategoryRepository {
+        return CategoryRepositoryImpl(categoryDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSavingsGoalRepository(
+        savingsGoalDao: SavingsGoalDao
+    ): SavingsGoalRepository {
+        return SavingsGoalRepositoryImpl(savingsGoalDao)
+    }
 
 }

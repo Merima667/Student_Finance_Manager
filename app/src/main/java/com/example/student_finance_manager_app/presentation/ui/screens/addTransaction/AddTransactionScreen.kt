@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -25,6 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.components.FormField
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.viewmodel.add_transaction.AddTransactionNavigationEvent
 import com.example.student_finance_manager_app.presentation.viewmodel.add_transaction.AddTransactionUiState
 import com.example.student_finance_manager_app.presentation.viewmodel.add_transaction.AddTransactionViewModel
@@ -52,25 +53,13 @@ fun AddTransactionScreen(
 
     when(uiState) {
         is AddTransactionUiState.Loading -> {
-            CircularProgressIndicator()
+            LoadingScreen()
         }
-
         is AddTransactionUiState.Error -> {
-            /*AddTransactionScreen(
-                titleInput = titleInput,
-                amountInput = amountInput,
-                selectedType = selectedType,
-                error = (uiState as AddTransactionUiState.Error).message,
-                onTitleChange = { titleInput = it; viewModel.resetUiState() },
-                onAmountChange = { amountInput = it; viewModel.resetUiState() },
-                onTypeChange = { selectedType = it },
-                onSubmit = { viewModel.addTransaction(titleInput, amountInput, selectedType) },
-                modifier = modifier
-            )*/
-            /*ErrorScreen(
-                errorMessage = ...,
-                buttonCLick = viewModel.resetUiState()
-            )*/
+            ErrorScreen(
+                errorMessage = (uiState as AddTransactionUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
         }
         else -> {
             AddTransactionScreen(

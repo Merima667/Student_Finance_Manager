@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.presentation.ui.screens.budget.component.BudgetProgressBar
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.viewmodel.budget.BudgetNavigationEvent
 import com.example.student_finance_manager_app.presentation.viewmodel.budget.BudgetUiState
 import com.example.student_finance_manager_app.presentation.viewmodel.budget.BudgetViewModel
@@ -40,10 +41,13 @@ fun BudgetScreen(
 
     when(uiState) {
         is BudgetUiState.Loading -> {
-            CircularProgressIndicator()
+            LoadingScreen()
         }
         is BudgetUiState.Error -> {
-            Text(text = (uiState as BudgetUiState.Error).message)
+            ErrorScreen(
+                errorMessage = (uiState as BudgetUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
         }
         is BudgetUiState.Success -> {
             val data = (uiState as BudgetUiState.Success).budgetData

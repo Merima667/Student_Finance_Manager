@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -17,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.presentation.ui.components.FormField
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.viewmodel.auth.login.LoginNavigationEvent
 import com.example.student_finance_manager_app.presentation.viewmodel.auth.login.LoginUiState
 import com.example.student_finance_manager_app.presentation.viewmodel.auth.login.LoginViewModel
@@ -52,7 +51,7 @@ fun LoginScreen(
 
     when(uiState) {
         is LoginUiState.Loading -> {
-            CircularProgressIndicator()
+            LoadingScreen()
         }
         is LoginUiState.Error -> {
             LoginScreen(

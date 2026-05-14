@@ -3,8 +3,8 @@ package com.example.student_finance_manager_app.presentation.viewmodel.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.model.repository.FakeProfileRepository
 import com.example.student_finance_manager_app.model.repository.TransactionRepository
+import com.example.student_finance_manager_app.model.repository.UserProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -19,9 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val userProfileRepository: UserProfileRepository
 ) : ViewModel() {
-    private val fakeRepository = FakeProfileRepository()
+
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Init)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
@@ -36,32 +37,33 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = ProfileUiState.Loading
             try {
-                val categoriesDeferred = async { fakeRepository.getProfileCategories() }
-                val profileDeferred = async { fakeRepository.getProfileData() }
+                val transactionsDeferred = async { transactionRepository.getAllTransactions().first() }
+                val userProfileDeferred = async { userProfileRepository.getUserProfile().first() }
 
-                val categories = categoriesDeferred.await()
-                val profile = profileDeferred.await()
+                val transactions = transactionsDeferred.await()
+                val userProfiles = userProfileDeferred.await()
+                val userProfile = userProfiles.firstOrNull()
 
-                val transactions = transactionRepository.getAllTransactions().first()
                 val totalIncome = transactions
                     .filter { it.type == TransactionType.INCOME }
                     .sumOf { it.amount }
                 val totalExpenses = transactions
                     .filter { it.type == TransactionType.EXPENSE }
                     .sumOf { it.amount }
+
                 _uiState.value = ProfileUiState.Success(
                     profileData = ProfileData(
-                        name = profile.name,
-                        monthlyBudget = profile.monthlyBudget,
+                        name = userProfile?.name ?: "Student",
+                        monthlyBudget = userProfile?.monthlyBudget ?: 0.0,
                         totalTransactions = transactions.size.toDouble(),
                         totalIncome = totalIncome,
                         totalExpenses = totalExpenses,
-                        categories = categories
+                        categories = emptyList()
                     )
                 )
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: IllegalStateException) {
+            } catch (e: Exception) {
                 _uiState.value = ProfileUiState.Error(
                     e.message ?: "Failed to load profile."
                 )

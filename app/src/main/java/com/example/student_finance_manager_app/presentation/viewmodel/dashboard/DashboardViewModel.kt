@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.model.repository.TransactionRepository
+import com.example.student_finance_manager_app.model.repository.UserProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -19,8 +21,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val repository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val userProfileRepository: UserProfileRepository
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Init)
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
@@ -38,8 +42,12 @@ class DashboardViewModel @Inject constructor(
     private fun loadDashboardData() {
         viewModelScope.launch {
             _uiState.value = DashboardUiState.Loading
-            try{
-                repository.getAllTransactions().collect { transactions ->
+            try {
+                combine(
+                    transactionRepository.getAllTransactions(),
+                    userProfileRepository.getUserProfile()
+                ) { transactions, userProfiles ->
+                    val userProfile = userProfiles.firstOrNull()
                     val totalIncome = transactions
                         .filter { it.type == TransactionType.INCOME }
                         .sumOf { it.amount }
@@ -48,19 +56,19 @@ class DashboardViewModel @Inject constructor(
                         .sumOf { it.amount }
                     val balance = totalIncome - totalExpenses
 
-                    _uiState.value = DashboardUiState.Success(
-                        dashboardData = DashboardData(
-                            name = "Student",
-                            totalIncome = totalIncome,
-                            totalExpanses = totalExpenses,
-                            balance = balance,
-                            transactions = transactions
-                        )
+                    DashboardData(
+                        name = userProfile?.name ?: "Student",
+                        totalIncome = totalIncome,
+                        totalExpanses = totalExpenses,
+                        balance = balance,
+                        transactions = transactions
                     )
+                }.collect { dashboardData ->
+                    _uiState.value = DashboardUiState.Success(dashboardData = dashboardData)
                 }
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: IllegalStateException) {
+            } catch (e: Exception) {
                 _uiState.value = DashboardUiState.Error(
                     e.message ?: "Failed to load dashboard."
                 )
