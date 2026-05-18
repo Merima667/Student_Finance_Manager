@@ -15,6 +15,7 @@ import com.example.student_finance_manager_app.presentation.ui.screens.login.Log
 import com.example.student_finance_manager_app.presentation.ui.screens.profile.ProfileScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.register.RegisterScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.transactions.TransactionScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun NavGraph(
@@ -29,9 +30,8 @@ fun NavGraph(
     ) {
         composable(Screen.Login.route) {
             LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate(Screen.Dashboard.route)
-                },
+                viewModel = hiltViewModel(),
+                onNavigate = { navController.navigate(Screen.Dashboard.route) },
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
                 }
@@ -39,21 +39,24 @@ fun NavGraph(
         }
         composable(Screen.Register.route) {
             RegisterScreen(
+                viewModel = hiltViewModel(),
+                onNavigate = { navController.navigate(Screen.Dashboard.route) },
                 onNavigateToLogin = {
                     navController.navigateUp()
                 }
             )
         }
         composable(Screen.Dashboard.route) {
-            DashboardScreen()
+            DashboardScreen(viewModel = hiltViewModel())
         }
         composable(Screen.Transactions.route) {
             TransactionScreen(
-                onTransactionClick = { transition ->
+                viewModel = hiltViewModel(),
+                onTransactionClick = { transaction ->
                     navController.navigate(
                         Screen.TransactionDetail.createRoute(
-                            transactionId = transition.id.toString(),
-                            transactionTitle = transition.title
+                            transactionId = transaction.id.toString(),
+                            transactionTitle = transaction.title
                         )
                     )
                 }
@@ -76,13 +79,16 @@ fun NavGraph(
             )
         }
         composable(Screen.Budget.route) {
-            BudgetScreen()
+            BudgetScreen(viewModel = hiltViewModel())
         }
         composable(Screen.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(viewModel = hiltViewModel())
         }
         composable(Screen.AddTransaction.route) {
-            AddTransactionScreen()
+            AddTransactionScreen(
+                viewModel = hiltViewModel(),
+                onNavigateBack = { navController.navigateUp() }
+            )
         }
     }
 }

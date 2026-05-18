@@ -1,58 +1,83 @@
 package com.example.student_finance_manager_app.presentation.ui.screens.transactions
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
-import com.example.student_finance_manager_app.model.HardcodedData
 import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
 import com.example.student_finance_manager_app.presentation.ui.screens.transactions.component.TransactionItem
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
+import com.example.student_finance_manager_app.presentation.viewmodel.transaction.TransactionNavigationEvent
+import com.example.student_finance_manager_app.presentation.viewmodel.transaction.TransactionUiState
+import com.example.student_finance_manager_app.presentation.viewmodel.transaction.TransactionViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionScreen(
-    transactions: List<Transaction> = HardcodedData.defaultTransactions,
+    viewModel: TransactionViewModel,
     onTransactionClick: (Transaction) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var searchQuery by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val filteredTransactions = transactions.filter {
-        it.title.contains(searchQuery, ignoreCase = true)
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                TransactionNavigationEvent.Navigate -> {}
+                TransactionNavigationEvent.NavigateBack -> {}
+            }
+        }
     }
 
-    TransactionScreen(
-        transactions = filteredTransactions,
-        searchQuery = searchQuery,
-        onSearchQueryChange = { searchQuery = it },
-        onTransactionClick = onTransactionClick,
-        modifier = modifier
-    )
+    when(uiState) {
+        is TransactionUiState.Loading -> {
+            LoadingScreen()
+        }
+        is TransactionUiState.Error -> {
+            ErrorScreen(
+                errorMessage = (uiState as TransactionUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
+        }
+
+        is TransactionUiState.Success -> {
+            val data = (uiState as TransactionUiState.Success)
+            TransactionScreen(
+                transactions = data.transactions,
+                searchQuery = data.searchQuery,
+                onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+                onTransactionClick = onTransactionClick,
+                modifier = modifier
+            )
+        }
+        else -> {}
+    }
 }
 
 @Composable
@@ -124,6 +149,11 @@ private fun TransactionScreen(
 @Composable
 fun TransactionScreenPreview() {
     MaterialTheme {
-        TransactionScreen()
+        TransactionScreen(
+            transactions = emptyList(),
+            searchQuery = "",
+            onSearchQueryChange = {},
+            onTransactionClick = {}
+        )
     }
 }

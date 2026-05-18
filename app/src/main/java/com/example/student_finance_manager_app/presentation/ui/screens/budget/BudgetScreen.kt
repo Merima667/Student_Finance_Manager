@@ -7,52 +7,63 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
-import com.example.student_finance_manager_app.model.Category
-import com.example.student_finance_manager_app.model.HardcodedData
-import com.example.student_finance_manager_app.model.TransactionType
 import com.example.student_finance_manager_app.presentation.ui.screens.budget.component.BudgetProgressBar
+import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
+import com.example.student_finance_manager_app.presentation.ui.screens.loading.LoadingScreen
+import com.example.student_finance_manager_app.presentation.viewmodel.budget.BudgetNavigationEvent
+import com.example.student_finance_manager_app.presentation.viewmodel.budget.BudgetUiState
+import com.example.student_finance_manager_app.presentation.viewmodel.budget.BudgetViewModel
 
 @Composable
 fun BudgetScreen(
-
+    viewModel: BudgetViewModel,
     modifier: Modifier = Modifier
 ) {
-    val monthlyBudget = HardcodedData.defaultUserProfile.monthlyBudget
-    val spentOnFood = HardcodedData.defaultTransactions
-        .filter { it.category == Category.FOOD && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val spentOnTransport = HardcodedData.defaultTransactions
-        .filter { it.category == Category.TRANSPORT && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val spentOnEducation = HardcodedData.defaultTransactions
-        .filter { it.category == Category.EDUCATION && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val spentOnEntertainment = HardcodedData.defaultTransactions
-        .filter { it.category == Category.ENTERTAINMENT && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val spentOnHealth = HardcodedData.defaultTransactions
-        .filter { it.category == Category.HEALTH && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
-    val spentOnOther = HardcodedData.defaultTransactions
-        .filter { it.category == Category.OTHER && it.type == TransactionType.EXPENSE }
-        .sumOf { it.amount }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BudgetScreen(
-        monthlyBudget = monthlyBudget,
-        spentOnFood = spentOnFood,
-        spentOnTransport = spentOnTransport,
-        spentOnEducation = spentOnEducation,
-        spentOnEntertainment = spentOnEntertainment,
-        spentOnHealth = spentOnHealth,
-        spentOnOther = spentOnOther,
-        modifier = modifier
-    )
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when(event) {
+                BudgetNavigationEvent.Navigate -> {}
+                BudgetNavigationEvent.NavigateBack -> {}
+            }
+        }
+    }
+
+    when(uiState) {
+        is BudgetUiState.Loading -> {
+            LoadingScreen()
+        }
+        is BudgetUiState.Error -> {
+            ErrorScreen(
+                errorMessage = (uiState as BudgetUiState.Error).message,
+                onErrorClick = { viewModel.resetUiState() }
+            )
+        }
+        is BudgetUiState.Success -> {
+            val data = (uiState as BudgetUiState.Success).budgetData
+            BudgetScreen(
+                monthlyBudget = data.monthlyBudget,
+                spentOnFood = data.spentOnFood,
+                spentOnTransport = data.spentOnTransport,
+                spentOnEducation = data.spentOnEducation,
+                spentOnEntertainment = data.spentOnEntertainment,
+                spentOnHealth = data.spentOnHealth,
+                spentOnOther = data.spentOnOther,
+                modifier = modifier
+            )
+        }
+        else -> {}
+    }
 }
 
 @Composable
@@ -128,6 +139,14 @@ private fun BudgetScreen(
 @Composable
 fun BudgetScreenPreview() {
     MaterialTheme {
-        BudgetScreen()
+        BudgetScreen(
+            monthlyBudget = 1000.0,
+            spentOnFood = 200.0,
+            spentOnTransport = 100.0,
+            spentOnEducation = 150.0,
+            spentOnEntertainment = 50.0,
+            spentOnHealth = 80.0,
+            spentOnOther = 30.0
+        )
     }
 }

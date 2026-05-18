@@ -7,13 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,62 +22,72 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
 import com.example.student_finance_manager_app.presentation.ui.components.FormField
+import com.example.student_finance_manager_app.presentation.viewmodel.auth.register.RegisterNavigationEvent
+import com.example.student_finance_manager_app.presentation.viewmodel.auth.register.RegisterUiState
+import com.example.student_finance_manager_app.presentation.viewmodel.auth.register.RegisterViewModel
 
 @Composable
 fun RegisterScreen(
-    onNavigateToLogin: () -> Unit = {},
+    viewModel: RegisterViewModel,
+    onNavigate: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
-    var nameError by remember { mutableStateOf<String?>(null) }
-    var emailError by remember { mutableStateOf<String?>(null) }
-    var passwordError by remember { mutableStateOf<String?>(null) }
-    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
-    val errorImePrazno = stringResource(R.string.error_ime_prazno)
-    val errorEmailPrazan = stringResource(R.string.error_email_prazan)
-    val errorEmailIspravan = stringResource(R.string.error_email_ispravan)
-    val errorLozinkaPrazna = stringResource(R.string.error_lozinka_prazna)
-    val errorLozinkaKratka = stringResource(R.string.error_lozinka_kratka)
-    val errorLozinkePodudaraju = stringResource(R.string.error_lozinke_podudaraju)
 
-    RegisterScreen(
-        name = name,
-        email = email,
-        password = password,
-        confirmPassword = confirmPassword,
-        nameError = nameError,
-        emailError = emailError,
-        passwordError = passwordError,
-        confirmPasswordError = confirmPasswordError,
-        onNameChange = { name = it; nameError = null },
-        onEmailChange = { email = it; emailError = null },
-        onPasswordChange = { password = it; passwordError = null },
-        onConfirmPasswordChange = { confirmPassword = it; confirmPasswordError = null },
-        onRegister = {
-            nameError = null
-            emailError = null
-            passwordError = null
-            confirmPasswordError = null
-            when {
-                name.isBlank() -> nameError = errorImePrazno
-                email.isBlank() -> emailError = errorEmailPrazan
-                !email.contains("@") -> emailError = errorEmailIspravan
-                password.isBlank() -> passwordError = errorLozinkaPrazna
-                password.length < 6 -> passwordError = errorLozinkaKratka
-                password != confirmPassword -> confirmPasswordError = errorLozinkePodudaraju
-                else -> onNavigateToLogin()
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when(event) {
+                RegisterNavigationEvent.Navigate -> onNavigate()
+                RegisterNavigationEvent.NavigateBack -> {}
             }
-        },
-        onNavigateToLogin = onNavigateToLogin,
-        modifier = modifier
-    )
+        }
+    }
 
-
+    when(uiState) {
+        is RegisterUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is RegisterUiState.Error -> {
+            RegisterScreen(
+                name = name,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword,
+                error = (uiState as RegisterUiState.Error).message,
+                onNameChange = { name = it; viewModel.resetUiState() },
+                onEmailChange = { email = it; viewModel.resetUiState() },
+                onPasswordChange = { password = it; viewModel.resetUiState() },
+                onConfirmPasswordChange = { confirmPassword = it; viewModel.resetUiState() },
+                onRegister = { viewModel.onRegisterClick(name,email, password) },
+                onNavigateToLogin = onNavigateToLogin,
+                modifier = modifier
+            )
+        }
+        else -> {
+            RegisterScreen(
+                name = name,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword,
+                error = null,
+                onNameChange = { name = it; },
+                onEmailChange = { email = it; },
+                onPasswordChange = { password = it; },
+                onConfirmPasswordChange = { confirmPassword = it; },
+                onRegister = { viewModel.onRegisterClick(name, email, password) },
+                onNavigateToLogin = onNavigateToLogin,
+                modifier = modifier
+            )
+        }
+    }
 }
 
 @Composable
@@ -85,10 +96,7 @@ private fun RegisterScreen(
     email: String,
     password: String,
     confirmPassword: String,
-    nameError: String?,
-    emailError: String?,
-    passwordError: String?,
-    confirmPasswordError: String?,
+    error: String?,
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
@@ -112,29 +120,29 @@ private fun RegisterScreen(
             label = stringResource(R.string.label_ime),
             value = name,
             onValueChange = onNameChange,
-            isError = nameError != null,
-            errorMessage = nameError
+            isError = error != null,
+            errorMessage = error
         )
         FormField(
             label = stringResource(R.string.label_email),
             value = email,
             onValueChange = onEmailChange,
-            isError = emailError != null,
-            errorMessage = emailError
+            isError = error != null,
+            errorMessage = error
         )
         FormField(
             label = stringResource(R.string.label_lozinka),
             value = password,
             onValueChange = onPasswordChange,
-            isError = passwordError != null,
-            errorMessage = passwordError
+            isError = error != null,
+            errorMessage = error
         )
         FormField(
             label = stringResource(R.string.label_potvrdi_lozinku),
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            isError = confirmPasswordError != null,
-            errorMessage = confirmPasswordError
+            isError = error != null,
+            errorMessage = error
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
         Button(
@@ -158,6 +166,18 @@ private fun RegisterScreen(
 @Composable
 fun RegisterScreenPreview() {
     MaterialTheme {
-        RegisterScreen()
+        RegisterScreen(
+            name = "",
+            email = "",
+            password = "",
+            confirmPassword = "",
+            error = null,
+            onNameChange = {},
+            onEmailChange = {},
+            onPasswordChange = {},
+            onConfirmPasswordChange = {},
+            onRegister = {},
+            onNavigateToLogin = {}
+        )
     }
 }
