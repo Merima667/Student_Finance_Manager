@@ -3,6 +3,7 @@ package com.example.student_finance_manager_app.presentation.viewmodel.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.model.repository.AuthRepository
 import com.example.student_finance_manager_app.model.repository.TransactionRepository
 import com.example.student_finance_manager_app.model.repository.UserProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Init)
@@ -68,6 +70,13 @@ class ProfileViewModel @Inject constructor(
                     e.message ?: "Failed to load profile."
                 )
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
+            _navigationEvent.send(ProfileNavigationEvent.Logout)
         }
     }
 

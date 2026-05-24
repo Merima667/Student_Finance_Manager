@@ -82,7 +82,14 @@ fun NavGraph(
             BudgetScreen(viewModel = hiltViewModel())
         }
         composable(Screen.Profile.route) {
-            ProfileScreen(viewModel = hiltViewModel())
+            ProfileScreen(
+                viewModel = hiltViewModel(),
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
         composable(Screen.AddTransaction.route) {
             AddTransactionScreen(
