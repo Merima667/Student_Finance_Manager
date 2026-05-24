@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -73,6 +74,7 @@ fun TransactionScreen(
                 searchQuery = data.searchQuery,
                 onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
                 onTransactionClick = onTransactionClick,
+                onLoadFromNetwork = { viewModel.loadTransactionFromNetwork() },
                 modifier = modifier
             )
         }
@@ -86,6 +88,7 @@ private fun TransactionScreen(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
+    onLoadFromNetwork: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
@@ -105,6 +108,12 @@ private fun TransactionScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
             )
+            Button(
+                onClick = onLoadFromNetwork,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Učitaj sa servera")
+            }
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChange,
@@ -153,6 +162,7 @@ fun TransactionScreenPreview() {
             transactions = emptyList(),
             searchQuery = "",
             onSearchQueryChange = {},
+            onLoadFromNetwork = {},
             onTransactionClick = {}
         )
     }

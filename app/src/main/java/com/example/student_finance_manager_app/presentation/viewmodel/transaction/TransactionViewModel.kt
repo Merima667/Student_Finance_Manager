@@ -3,6 +3,7 @@ package com.example.student_finance_manager_app.presentation.viewmodel.transacti
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.model.repository.TransactionNetworkRepository
 import com.example.student_finance_manager_app.model.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
-    private val repository: TransactionRepository
+    private val repository: TransactionRepository,
+    private val networkRepository: TransactionNetworkRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<TransactionUiState>(TransactionUiState.Init)
     val uiState: StateFlow<TransactionUiState> = _uiState.asStateFlow()
@@ -46,6 +48,25 @@ class TransactionViewModel @Inject constructor(
             } catch (e: IllegalStateException) {
                 _uiState.value = TransactionUiState.Error(
                     e.message ?: "Failed to load transactions."
+                )
+            }
+        }
+    }
+
+    fun loadTransactionFromNetwork() {
+        viewModelScope.launch {
+            _uiState.value = TransactionUiState.Loading
+            try {
+                val transactions = networkRepository.getTransactions()
+                _uiState.value = TransactionUiState.Success(
+                    transactions = transactions,
+                    searchQuery = ""
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiState.value = TransactionUiState.Error(
+                    e.message ?: "Failed to load transactions from network."
                 )
             }
         }
