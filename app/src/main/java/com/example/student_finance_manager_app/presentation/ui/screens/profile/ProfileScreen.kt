@@ -3,10 +3,13 @@ package com.example.student_finance_manager_app.presentation.ui.screens.profile
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
-import com.example.student_finance_manager_app.model.CategoryItem
+import com.example.student_finance_manager_app.domain.data.CategoryItem
 import com.example.student_finance_manager_app.presentation.ui.components.CategoryCard
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
 import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
@@ -33,6 +36,7 @@ import com.example.student_finance_manager_app.presentation.viewmodel.profile.Pr
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -42,6 +46,7 @@ fun ProfileScreen(
             when(event) {
                 ProfileNavigationEvent.Navigate -> {}
                 ProfileNavigationEvent.NavigateBack -> {}
+                ProfileNavigationEvent.Logout -> onLogout()
             }
         }
     }
@@ -66,6 +71,7 @@ fun ProfileScreen(
                 totalIncome = data.totalIncome,
                 totalExpenses = data.totalExpenses,
                 categories = data.categories,
+                onLogout = { viewModel.logout() },
                 modifier = modifier
             )
         }
@@ -81,6 +87,7 @@ private fun ProfileScreen(
     totalIncome: Double,
     totalExpenses: Double,
     categories: List<CategoryItem>,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -125,6 +132,18 @@ private fun ProfileScreen(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
+
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text("Odjavi se")
+        }
     }
 }
 
@@ -138,7 +157,8 @@ fun ProfileScreenPreview() {
             totalTransactions = 10.0,
             totalIncome = 800.0,
             totalExpenses = 300.0,
-            categories = emptyList()
+            categories = emptyList(),
+            onLogout = {}
         )
     }
 }

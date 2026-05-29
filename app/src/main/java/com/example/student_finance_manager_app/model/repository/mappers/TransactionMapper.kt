@@ -1,9 +1,9 @@
 package com.example.student_finance_manager_app.model.repository.mappers
 
-import com.example.student_finance_manager_app.model.Category
-import com.example.student_finance_manager_app.model.Transaction
-import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.model.data.local.entity.TransactionEntity
+import com.example.student_finance_manager_app.domain.data.Category
+import com.example.student_finance_manager_app.domain.data.Transaction
+import com.example.student_finance_manager_app.domain.data.TransactionType
+import com.example.student_finance_manager_app.model.datasource.local.entity.TransactionEntity
 
 fun TransactionEntity.toTransaction(): Transaction {
     return Transaction(

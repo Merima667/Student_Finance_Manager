@@ -1,7 +1,8 @@
 package com.example.student_finance_manager_app.model.repository
 
-import com.example.student_finance_manager_app.model.data.local.dao.BudgetDao
-import com.example.student_finance_manager_app.model.data.local.entity.BudgetEntity
+import com.example.student_finance_manager_app.domain.repository.BudgetRepository
+import com.example.student_finance_manager_app.model.datasource.local.dao.BudgetDao
+import com.example.student_finance_manager_app.model.datasource.local.entity.BudgetEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

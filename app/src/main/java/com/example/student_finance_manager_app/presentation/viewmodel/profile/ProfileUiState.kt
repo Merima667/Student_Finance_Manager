@@ -1,6 +1,6 @@
 package com.example.student_finance_manager_app.presentation.viewmodel.profile
 
-import com.example.student_finance_manager_app.model.CategoryItem
+import com.example.student_finance_manager_app.domain.data.CategoryItem
 
 data class ProfileData(
     val name: String,

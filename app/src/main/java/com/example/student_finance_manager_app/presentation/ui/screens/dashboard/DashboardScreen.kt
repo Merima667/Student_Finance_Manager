@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
-import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.domain.data.Transaction
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
 import com.example.student_finance_manager_app.presentation.ui.components.TransactionCard
 import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen
@@ -69,6 +70,7 @@ fun DashboardScreen(
                 balance = data.balance,
                 transactions = data.transactions,
                 financeTip = financeTip,
+                onLoadFromFirestore = { viewModel.loadDashboardDataFromFirestore() },
                 modifier = modifier
             )
         }
@@ -84,6 +86,7 @@ private fun DashboardScreen(
     balance: Double,
     transactions: List<Transaction>,
     financeTip: String,
+    onLoadFromFirestore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -98,6 +101,14 @@ private fun DashboardScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
         )
+
+        Button(
+            onClick = onLoadFromFirestore,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Učitaj sa Firestore-a")
+        }
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -156,7 +167,8 @@ fun DashboardScreenPreview() {
             totalExpenses = 500.0,
             balance = 500.0,
             transactions = emptyList(),
-            financeTip = "Track your daily expenses to stay on budget"
+            financeTip = "Track your daily expenses to stay on budget",
+            onLoadFromFirestore = {}
         )
     }
 }

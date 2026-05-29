@@ -2,8 +2,17 @@ package com.example.student_finance_manager_app.model.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.student_finance_manager_app.model.data.local.dao.*
-import com.example.student_finance_manager_app.model.data.local.db.AppDatabase
+import com.example.student_finance_manager_app.domain.repository.BudgetRepository
+import com.example.student_finance_manager_app.domain.repository.CategoryRepository
+import com.example.student_finance_manager_app.domain.repository.SavingsGoalRepository
+import com.example.student_finance_manager_app.domain.repository.TransactionRepository
+import com.example.student_finance_manager_app.domain.repository.UserProfileRepository
+import com.example.student_finance_manager_app.model.datasource.local.dao.BudgetDao
+import com.example.student_finance_manager_app.model.datasource.local.dao.CategoryDao
+import com.example.student_finance_manager_app.model.datasource.local.dao.SavingsGoalDao
+import com.example.student_finance_manager_app.model.datasource.local.dao.TransactionDao
+import com.example.student_finance_manager_app.model.datasource.local.dao.UserProfileDao
+import com.example.student_finance_manager_app.model.datasource.local.db.AppDatabase
 import com.example.student_finance_manager_app.model.repository.*
 import dagger.Module
 import dagger.Provides

@@ -2,9 +2,10 @@ package com.example.student_finance_manager_app.presentation.viewmodel.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.model.repository.TransactionRepository
-import com.example.student_finance_manager_app.model.repository.UserProfileRepository
+import com.example.student_finance_manager_app.domain.data.TransactionType
+import com.example.student_finance_manager_app.domain.repository.TransactionFirestoreRepository
+import com.example.student_finance_manager_app.domain.repository.TransactionRepository
+import com.example.student_finance_manager_app.domain.repository.UserProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val firestoreRepository: TransactionFirestoreRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Init)
@@ -51,15 +53,15 @@ class DashboardViewModel @Inject constructor(
                     val totalIncome = transactions
                         .filter { it.type == TransactionType.INCOME }
                         .sumOf { it.amount }
-                    val totalExpenses = transactions
+                    val totalExpanses = transactions
                         .filter { it.type == TransactionType.EXPENSE }
                         .sumOf { it.amount }
-                    val balance = totalIncome - totalExpenses
+                    val balance = totalIncome - totalExpanses
 
                     DashboardData(
                         name = userProfile?.name ?: "Student",
                         totalIncome = totalIncome,
-                        totalExpanses = totalExpenses,
+                        totalExpanses = totalExpanses,
                         balance = balance,
                         transactions = transactions
                     )
@@ -88,6 +90,39 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             observeFinanceTips().collect { tip ->
                 _financeTip.value = tip
+            }
+        }
+    }
+
+    fun loadDashboardDataFromFirestore() {
+        viewModelScope.launch {
+            _uiState.value = DashboardUiState.Loading
+            try {
+                firestoreRepository.getTransactions().collect { transactions ->
+                    val totalIncome = transactions
+                        .filter { it.type == TransactionType.INCOME }
+                        .sumOf { it.amount }
+                    val totalExpenses = transactions
+                        .filter { it.type == TransactionType.EXPENSE }
+                        .sumOf { it.amount }
+                    val balance = totalIncome - totalExpenses
+
+                    _uiState.value = DashboardUiState.Success(
+                        dashboardData = DashboardData(
+                            name = "Student",
+                            totalIncome = totalIncome,
+                            totalExpanses = totalExpenses,
+                            balance = balance,
+                            transactions = transactions
+                        )
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiState.value = DashboardUiState.Error(
+                    e.message ?: "Failed to load from Firestore."
+                )
             }
         }
     }
