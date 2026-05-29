@@ -2,11 +2,11 @@ package com.example.student_finance_manager_app.presentation.viewmodel.budget
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.student_finance_manager_app.model.Category
-import com.example.student_finance_manager_app.model.TransactionType
-import com.example.student_finance_manager_app.model.repository.BudgetRepository
-import com.example.student_finance_manager_app.model.repository.TransactionRepository
-import com.example.student_finance_manager_app.model.repository.UserProfileRepository
+import com.example.student_finance_manager_app.domain.data.Category
+import com.example.student_finance_manager_app.domain.data.TransactionType
+import com.example.student_finance_manager_app.domain.repository.BudgetRepository
+import com.example.student_finance_manager_app.domain.repository.TransactionRepository
+import com.example.student_finance_manager_app.domain.repository.UserProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel

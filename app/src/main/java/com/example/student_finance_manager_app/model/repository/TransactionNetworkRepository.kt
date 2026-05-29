@@ -1,8 +1,8 @@
 package com.example.student_finance_manager_app.model.repository
 
-import com.example.student_finance_manager_app.model.Transaction
-import com.example.student_finance_manager_app.model.Category
-import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.domain.data.Transaction
+import com.example.student_finance_manager_app.domain.data.Category
+import com.example.student_finance_manager_app.domain.data.TransactionType
 import com.example.student_finance_manager_app.model.datasource.network.dto.CreateTransactionDto
 import com.example.student_finance_manager_app.model.datasource.network.dto.TransactionDto
 import com.example.student_finance_manager_app.model.datasource.network.dto.UpdateTransactionDto

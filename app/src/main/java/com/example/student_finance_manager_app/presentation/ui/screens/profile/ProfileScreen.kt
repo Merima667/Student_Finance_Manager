@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.student_finance_manager_app.R
-import com.example.student_finance_manager_app.model.CategoryItem
+import com.example.student_finance_manager_app.domain.data.CategoryItem
 import com.example.student_finance_manager_app.presentation.ui.components.CategoryCard
 import com.example.student_finance_manager_app.presentation.ui.components.StatCard
 import com.example.student_finance_manager_app.presentation.ui.screens.error.ErrorScreen

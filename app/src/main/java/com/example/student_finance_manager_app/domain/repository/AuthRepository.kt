@@ -1,4 +1,4 @@
-package com.example.student_finance_manager_app.model.repository
+package com.example.student_finance_manager_app.domain.repository
 
 import com.google.firebase.auth.FirebaseUser
 

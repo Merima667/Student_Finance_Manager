@@ -1,8 +1,8 @@
 package com.example.student_finance_manager_app.model.di
 
-import com.example.student_finance_manager_app.model.repository.AuthRepository
+import com.example.student_finance_manager_app.domain.repository.AuthRepository
 import com.example.student_finance_manager_app.model.repository.AuthRepositoryImpl
-import com.example.student_finance_manager_app.model.repository.TransactionFirestoreRepository
+import com.example.student_finance_manager_app.domain.repository.TransactionFirestoreRepository
 import com.example.student_finance_manager_app.model.repository.TransactionFirestoreRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

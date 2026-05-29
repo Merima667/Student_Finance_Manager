@@ -1,7 +1,7 @@
-package com.example.student_finance_manager_app.model.repository
+package com.example.student_finance_manager_app.domain.repository
 
-import com.example.student_finance_manager_app.model.data.local.entity.CategoryEntity
-import com.example.student_finance_manager_app.model.data.local.entity.CategoryWithTransactions
+import com.example.student_finance_manager_app.model.datasource.local.entity.CategoryEntity
+import com.example.student_finance_manager_app.model.datasource.local.entity.CategoryWithTransactions
 import kotlinx.coroutines.flow.Flow
 
 interface CategoryRepository {

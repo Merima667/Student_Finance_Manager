@@ -1,4 +1,6 @@
-package com.example.student_finance_manager_app.model
+package com.example.student_finance_manager_app.domain.data
+
+import com.example.student_finance_manager_app.domain.data.UserProfile
 
 data class CategoryItem(
     val name: String,

@@ -1,6 +1,6 @@
 package com.example.student_finance_manager_app.presentation.viewmodel.dashboard
 
-import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.domain.data.Transaction
 
 data class DashboardData(
     val name: String,

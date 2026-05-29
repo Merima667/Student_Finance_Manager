@@ -1,7 +1,8 @@
 package com.example.student_finance_manager_app.model.repository
 
-import com.example.student_finance_manager_app.model.data.local.dao.UserProfileDao
-import com.example.student_finance_manager_app.model.data.local.entity.UserProfileEntity
+import com.example.student_finance_manager_app.domain.repository.UserProfileRepository
+import com.example.student_finance_manager_app.model.datasource.local.dao.UserProfileDao
+import com.example.student_finance_manager_app.model.datasource.local.entity.UserProfileEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

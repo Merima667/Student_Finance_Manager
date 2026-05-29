@@ -1,8 +1,8 @@
-package com.example.student_finance_manager_app.model.data.local.dao
+package com.example.student_finance_manager_app.model.datasource.local.dao
 
 import androidx.room.*
-import com.example.student_finance_manager_app.model.data.local.entity.CategoryEntity
-import com.example.student_finance_manager_app.model.data.local.entity.CategoryWithTransactions
+import com.example.student_finance_manager_app.model.datasource.local.entity.CategoryEntity
+import com.example.student_finance_manager_app.model.datasource.local.entity.CategoryWithTransactions
 import kotlinx.coroutines.flow.Flow
 
 @Dao

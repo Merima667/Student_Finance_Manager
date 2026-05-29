@@ -1,6 +1,6 @@
-package com.example.student_finance_manager_app.model.repository
+package com.example.student_finance_manager_app.domain.repository
 
-import com.example.student_finance_manager_app.model.Transaction
+import com.example.student_finance_manager_app.domain.data.Transaction
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {

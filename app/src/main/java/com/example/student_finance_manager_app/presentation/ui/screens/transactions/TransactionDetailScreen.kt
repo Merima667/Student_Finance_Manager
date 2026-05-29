@@ -17,7 +17,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.student_finance_manager_app.R
-import com.example.student_finance_manager_app.model.HardcodedData
+import com.example.student_finance_manager_app.domain.data.HardcodedData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

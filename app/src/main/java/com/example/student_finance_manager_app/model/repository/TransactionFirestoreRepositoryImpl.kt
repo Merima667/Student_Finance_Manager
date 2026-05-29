@@ -1,8 +1,9 @@
 package com.example.student_finance_manager_app.model.repository
 
-import com.example.student_finance_manager_app.model.Category
-import com.example.student_finance_manager_app.model.Transaction
-import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.domain.repository.TransactionFirestoreRepository
+import com.example.student_finance_manager_app.domain.data.Category
+import com.example.student_finance_manager_app.domain.data.Transaction
+import com.example.student_finance_manager_app.domain.data.TransactionType
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-package com.example.student_finance_manager_app.model
+package com.example.student_finance_manager_app.domain.data
 
 import java.util.UUID
 

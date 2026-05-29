@@ -1,7 +1,7 @@
 package com.example.student_finance_manager_app.model.repository.mappers
 
-import com.example.student_finance_manager_app.model.UserProfile
-import com.example.student_finance_manager_app.model.data.local.entity.UserProfileEntity
+import com.example.student_finance_manager_app.domain.data.UserProfile
+import com.example.student_finance_manager_app.model.datasource.local.entity.UserProfileEntity
 
 fun UserProfileEntity.toUserProfile(): UserProfile {
     return UserProfile(

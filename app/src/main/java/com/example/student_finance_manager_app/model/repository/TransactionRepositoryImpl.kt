@@ -1,7 +1,8 @@
 package com.example.student_finance_manager_app.model.repository
 
-import com.example.student_finance_manager_app.model.Transaction
-import com.example.student_finance_manager_app.model.data.local.dao.TransactionDao
+import com.example.student_finance_manager_app.domain.repository.TransactionRepository
+import com.example.student_finance_manager_app.domain.data.Transaction
+import com.example.student_finance_manager_app.model.datasource.local.dao.TransactionDao
 import com.example.student_finance_manager_app.model.repository.mappers.toEntity
 import com.example.student_finance_manager_app.model.repository.mappers.toTransaction
 import kotlinx.coroutines.flow.Flow

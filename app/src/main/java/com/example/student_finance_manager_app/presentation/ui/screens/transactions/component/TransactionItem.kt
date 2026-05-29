@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
-import com.example.student_finance_manager_app.model.Transaction
-import com.example.student_finance_manager_app.model.TransactionType
+import com.example.student_finance_manager_app.domain.data.Transaction
+import com.example.student_finance_manager_app.domain.data.TransactionType
 
 @Composable
 fun TransactionItem(

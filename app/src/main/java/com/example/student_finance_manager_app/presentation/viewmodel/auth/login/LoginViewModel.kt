@@ -2,7 +2,7 @@ package com.example.student_finance_manager_app.presentation.viewmodel.auth.logi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.student_finance_manager_app.model.repository.AuthRepository
+import com.example.student_finance_manager_app.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel

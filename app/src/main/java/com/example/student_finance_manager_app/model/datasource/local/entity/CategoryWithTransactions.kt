@@ -1,4 +1,4 @@
-package com.example.student_finance_manager_app.model.data.local.entity
+package com.example.student_finance_manager_app.model.datasource.local.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation
